@@ -1,6 +1,3 @@
-Nazwa zespołu: grupa0
-Skład zespołu: 
-Mazurek Magdalena
-Łepicka Dorota
-Walczyński Michal
+Aby uruchomić aplikację należy zainstalować załączony pakiet o nazwie `grupa0`.
+Następnie otworzyć pliki `server.R` oraz `ui.R` i włączyć aplikację.
 
