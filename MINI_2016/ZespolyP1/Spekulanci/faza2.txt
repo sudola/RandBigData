@@ -1,3 +1,4 @@
+
 Od strony kodu R to kilka rzeczy trzeba poprawić i rozbudować.
 Raport jest dopracowany, choć myślę że da się go poprawić - ułatwić jego czytanie.
 W kolejnym kroku warto zrobić i pakiet i zastanowić się nad aplikacją (aplikacja to opcja, ale pakiet - obowiązek).
