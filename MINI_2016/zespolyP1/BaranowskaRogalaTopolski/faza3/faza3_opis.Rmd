@@ -1,0 +1,792 @@
+---
+title: "Faza 3 projektu 'Centrum Nauki Kopernik"
+author: "Ewa Baranowska, Zofia Rogala, Bartosz Topolski"
+date: "25 kwietnia 2016"
+output:
+  html_document:
+    toc: true
+    depth: 4
+---
+
+
+# Streszczenie
+
+W tym dokumencie umieściliśmy opis wykonanych prac w ramach trzeciej fazy projektu 'Centrum Nauki Kopernik' - najpierw omawiamy zmiany, które zaszły w aplikacji, a następnie umieszczamy kody nowych, użytych w ramach tej fazy funkcji, by potem zamieścić ostateczne wersje plików server.R i ui.R wraz z adresem, pod którym można znaleźć gotową aplikację.
+
+# Opis
+
+W trzeciej fazie projektu skupiliśmy się na dopracowaniu aplikacji utworzonej w drugiej fazie projektu. Udoskonaliliśmy aplikację pod względem technicznym - usunęliśmy błędy i przyspieszyliśmy działanie funkcji rysujacej połączenia między urządzeniami (funkcja [plot_paths2](#plot_paths2)). Dodaliśmy też do aplikacji nowe funkcjonalności. Do lewego panelu dodaliśmy opcję zaznaczenia typowej ścieżki nie tylko dla wybranego okresu, ale także dla całego analizowanego roku 2013. Oprócz tego uwzględniliśmy możliwość odizolowania urządzenia, tj. po kliknięciu na mapę, na konkretne urządzenie, zostają wyrysowane tylko połączenia wychodzące z tego urządzenia do pozostałych, a typowe ścieżki dla wybranego okresu oraz dla całego roku zaczynają się właśnie w tym urządzeniu. Poniżej lewego menu pojawiają się informacje o wybranej stacji: jej numer, pełna nazwa i 3 stację, do których użytkownik najczęściej udawał się po odwiedzeniu wybranej. 
+
+Następną zmianą w aplikacji było dodanie zakładki `Dane`, która pokazuje dla wybranego wcześniej urządzenia, tabelę z informacjami na jego temat. W tabeli znajdują się ułożone malejąco (pod względem prawdopodobieństwa odwiedzenia), kolejne urządzenia odwiedzane po odwiedzeniu wybranego urządzenia, wraz z ich pełną nazwą, kategorią, prawdopodobieństwem odwiedzenia i łączną ilością przejść do niego z wybranego urządzenia ( w wybranym czasie). Kolejne wiersze mają postać:
+
+| stacja | nazwa | kategoria | p | total |
+|:------:|:-----:|:---------:|:-:|:-----:|
+|05|	Strojenie mózgu|	JA	|14.53 %|	8784|
+
+Następnie dodaliśmy zakładkę `Statystyki`, która pokazuje za pomocą boxplotów rozkład czasów i długości pojedynczych ścieżek w wybranym okresie i w całym 2013 roku. Aby zwizualizować te efekty, niezbędnym było przygotowanie sobie odpowiednich danych. Użyliśmy do tego plików przygotowanych w drugiej fazie projektu, które dla każdego dnia roku miały następującą postać:
+
+
+```{r, warning = FALSE, message=FALSE,tidy=F, echo = FALSE}
+library(knitr)
+sciezka <- "C:/Users/E540/Desktop/SMAD/R i Big Data/Projekt 1/ScrappingTextMining/sciezki_dane2013"
+dane_przykl2 <- read.csv(file.path(sciezka, "01_12.txt"), stringsAsFactors = F)
+kable(head(dane_przykl2),align = "c")
+```
+
+Dane są posortowane po id użytkownika (visitor_id) i czasie rozpoczęcia użytkowania urządzenia (begin_time), zatem kolejne wiersze dla ustalonego visitor_id przedstawiają ścieżkę  użytkownika od początku do końca pobytu w CNK Regeneracja w danym dniu. Tych danych użyliśmy w funkcji [doStatystyk_funkcja](#doStat), w wyniku czego uzyskaliśmy zbiór doStatystyk.Rda - listę list dla każdego dnia, postaci:
+
+```{r, warning = FALSE, message=FALSE,tidy=F, echo = FALSE}
+library(knitr)
+sciezka <- "C:/Users/E540/Desktop/SMAD/R i Big Data/Projekt 1/3 faza/sciezkiCNK-master/data"
+load(file.path(sciezka, "doStatystyk.Rda"))
+print(doStatystyk[[1]])
+```
+
+Pierwszym elementem każdej listy z tej listy jest wektor z długościami pojedynczych ścieżek, drugi z czasami pojedynczych ścieżek, a trzeci i czwarty z najdłuższą ścieżką w danych dniu, pod względem długości i czasu. I tego zbioru użyliśmy do wyrysowania rozkładów czasów i długości w zakładce `Statystyki`. W zakładce tej, oprócz dwóch, podwójnych boxplotów, umieściliśmy informacje liczbowe na temat ilości dni w wybranym zakresie i średniej czasu i długości w wybranym okresie i w całym 2013 roku. Szczególy tych zmian można zaobserwować w aplikacji, o której więcej w rozdziale [Ostateczna wersja aplikacji](#aplikacja).
+
+# Nowe funkcje
+
+Poniżej przedstawimy funkcje, które dodaliśmy w tej fazie projektu.  Wszystkie funkcje wraz z ich dokumentacją dostępne są w pakiecie `sciezkiCNK`, dostępnym pod adresem https://github.com/topolskib/sciezkiCNK. Dokładny opis jego zawartości znajduje się w dołączonej dokumentacji wygenerowanej przez R (plik `manual.pdf`). 
+
+## roznica_czasu
+
+wektorowa funkcja licząca różnicę między dwoma czasami (potrzebna do przeróbki danych ze ścieżkami)
+
+```{r, eval=F}
+#' Funkcja wyliczająca róznicę między czasami
+#' 
+#' @param czas_potem wektor czasów późniejszych
+#' 
+#' @param czas_przedtem wektor czasów wcześniejszych
+#' 
+#' @param units jednostki, w jakich ma być zwracana różnica czasów
+#' 
+#' @param format format w jakim podane są czasy
+#' 
+#' @return wektor z różnicami czasów w jednostkach określonych parametrem units
+#' 
+#' @export
+
+
+roznica_czasu <- function(czas_potem, czas_przedtem, units="secs", format="%H:%M:%S"){
+   
+   # jesli roznica czasu po a czasu przed jest ujemna, to minelismy polnoc po drodze
+   roznica <- as.numeric(difftime(strptime(czas_potem,format = format ), 
+                                  strptime(czas_przedtem,format = format ), 
+                                  units=units))
+   roznica[roznica <0] <- as.numeric(difftime(strptime(paste0("2013-01-02 ",czas_potem[roznica <0]),
+                                                       format = paste0("%Y-%m-%d ",format) ), 
+                                              strptime(paste0("2013-01-01 ",czas_przedtem[roznica <0]),
+                                                       format = paste0("%Y-%m-%d ",format) ), 
+                                              units=units))
+   
+   roznica
+}
+
+```
+
+## doStatystyk_funkcja {#doStat}
+
+funkcja przetwarzająca pliki ze ścieżkami do postaci zbioru danych doStatystyk.Rda
+
+```{r,eval=F}
+
+#' Funkcja służy do tworzenia danych z długościami i czasami ścieżek dla każdego dnia
+#' 
+#' @param sciezka ścieżka dostępu do katalogu ze ścieżkami
+#' 
+#' @param out ścieżka do katalogu, w którym mają zostać zapisane dane (jako plik
+#' doStatystyk.Rda)
+#' 
+#' @export
+
+doStatystyk_funkcja <- function(sciezka, out){
+   
+   pliki <- list.files(sciezka,full.names = F)
+   
+   require(parallel)
+   require(sciezkiCNK) # roznica_czasu potrzebna
+   
+   ile_rdzeni <- detectCores() - 1 
+   klaster <-makeCluster(ile_rdzeni)
+   
+   clusterExport(klaster, c("sciezka", "pliki"))
+   clusterEvalQ(klaster, library(sciezkiCNK))
+   
+   doStatystyk <- parLapply(klaster, pliki, function(i){
+      
+      dlugosci_sciezek <- numeric()
+      czasy_sciezek <- numeric()
+      najDlugosc <- character()
+      najCzas <- character()
+      
+      plik <- file.path(sciezka, i)
+      
+      dane <- read.table(plik,header=T, sep=",", stringsAsFactors = F)
+      
+      bezPowtorzen <- dane[!duplicated(dane[,c("visitor_id","exhibit")]),]
+      
+      a <- table(bezPowtorzen$visitor_id)
+      
+      dlugosci_sciezek <- as.numeric(a)
+      names(dlugosci_sciezek) <- names(a)
+      czasy <- numeric(length(a))
+      
+      for(j in 1:length(a)){
+         pocz <- min(format(dane[dane$visitor_id == names(a)[j],"begin_time"],format = "%H:%M:%S"))
+         kon <- max(format(dane[dane$visitor_id == names(a)[j],"end_time"],format = "%H:%M:%S"))
+         czasy[j] <- roznica_czasu(kon,pocz)
+      }
+      czasy_sciezek <- czasy
+      names(czasy_sciezek) <- names(a)
+      
+      ktory <- names(which.max(dlugosci_sciezek))
+      najDlugosc <- bezPowtorzen[bezPowtorzen$visitor_id == ktory, "exhibit"]
+      ktoryCzas <- names(which.max(czasy_sciezek))
+      najCzas <-  bezPowtorzen[bezPowtorzen$visitor_id == ktoryCzas, "exhibit"]
+      
+      wynik <- list(dlugosci_sciezek = dlugosci_sciezek, czasy_sciezek = czasy_sciezek,  
+                    najDlugosc = najDlugosc, najCzas = najCzas)
+      
+   })
+   
+   stopCluster(klaster)
+   
+   nazwy <- stri_replace_first_fixed(pliki, pattern = ".txt", replacement = "")
+   names(doStatystyk) <- nazwy
+   
+   
+   save(doStatystyk, file=file.path(out, "doStatystyk.Rda"))
+   
+}
+
+
+```
+
+
+
+## plot_paths2 {#plot_paths2}
+
+zmieniona funkcja rysujaca połączenia (linie proste między urządzeniami) 
+
+```{r, eval=F}
+#' Funkcja służy do rysowania scieżek z danych
+#' 
+#' @param data ramka danych z kolumnami tekstowymi from i to określającymi urządzenia początkowe i końcowe oraz numeryczną
+#' kolumnętotal 
+#' @param slownik ramka danych z kolumnami x i y określającymi współrzędne urządzenia i  kolumnę nr określającą 
+#' numer urządzenia
+#' @param col kolor linii
+#' @param lwd szerekość linii
+#' @param rozmiary  rozmiary mapy
+#' @export
+
+
+plot_paths2 <- function (data, slownik, col= "#160773", lwd = 3.5, rozmiary = c(1018, 886)) 
+{
+   require(dplyr)
+   
+   doRGB <- as.numeric(col2rgb(col))/255
+   
+   data <- data %>% filter(from != "---" & to != "---" & total > 0.002) %>%
+      mutate(x_pocz = slownik$x[match(from, slownik$nr)],
+             y_pocz = rozmiary[2] - slownik$y[match(from, slownik$nr)],
+             x_kon = slownik$x[match(to, slownik$nr)],
+             y_kon = rozmiary[2] - slownik$y[match(to, slownik$nr)],
+             kolor = rgb(doRGB[1], doRGB[2], doRGB[3], alpha = total)) %>%
+      filter(!is.na(x_pocz) & !is.na(x_kon))
+   
+   segments(x0 = data$x_pocz, y0 = data$y_pocz, 
+            x1 = data$x_kon, y1 = data$y_kon, lwd = lwd, col = data$kolor)
+}
+
+```
+
+## multiplot
+
+funkcja łącząca parę wykresów w jeden
+
+```{r, eval=F}
+#' Funkcja służy do łączenia wykresów w jeden wykres
+#' 
+#' @param ... wykresy do złączenia
+#' 
+#' @param cols liczba kolumn z wykresami
+#' 
+#' @param titlesize wielkość czcionki tytułu
+#' 
+#' @param title tytuł wykresu
+#' 
+#' @export
+
+multiplot <- function(..., cols=1, titlesize = 20, title="Analiza pojedynczych ścieżek w wybranych dniach") {
+   
+   require(grid)
+   
+   plots <- c(list(...))
+   
+   numPlots = length(plots)
+
+   layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+   
+   if (numPlots==1) {
+      print(plots[[1]])
+      
+   } else {
+      
+      grid.newpage()
+      pushViewport(viewport(layout = grid.layout(nrow(layout)+1, ncol(layout), heights = unit(c(0.7, 4), "null"))))
+      grid.text(title, vp = viewport(layout.pos.row = 1, layout.pos.col = 1:2), gp = gpar(fontsize = titlesize))
+      
+      for (i in 1:numPlots) {
+         matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+         print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row+1,
+                                         layout.pos.col = matchidx$col))
+      }
+   }
+}
+
+
+```
+
+
+
+## rysujBoxploty
+
+funkcja rysująca boxploty
+
+```{r, eval=F}
+#' Funkcja służy do rysowania 3-częściowego wykresu (boxplot z rozkładem 
+#' długości pojedynczej ścieżki, boxplot z rozkładem czasu pojedynczej ścieżki
+#' i pusty wykres z informacjami o średniej dla wybranych wielkości
+#' 
+#' @param dni wektor dni, których rozkład ma być wyrysowany
+#' 
+#' @param summary_dl wektor z charakterystykami rozkładu dla długości scieżek
+#' dla okresu, z którym będziemy porównujemy (min, Ikwartyl, mediana, średnia, IIIkwartyl, max)
+#' 
+#' @param summary_czas wektor z charakterystykami rozkładu dla czasu scieżek
+#' dla okresu, z którym będziemy porównujemy (min, Ikwartyl, mediana, średnia, IIIkwartyl, max)
+#' 
+#' @export
+
+rysujBoxploty <- function(dni, summary_dl = c(min =1, low=3, med=7, mean=8.304, upper=12,max=53),
+                          summary_czas = c(min=0, low=578, med=1582, mean=2353, upper=3076,max=36220)){
+   
+   
+   require(ggplot2)
+
+   dane <- doStatystyk[dni]
+   
+   if(length(dni) == 1){
+      dane_dlug <- summary(dane[[1]]$dlugosci_sciezek)
+      dane_czasy <- summary(dane[[1]]$czasy_sciezek)
+   }else{
+      dane_dlug <- summary(unlist(sapply(dane, "[[", 1)))
+      dane_czasy <- summary(unlist(sapply(dane, "[[", 2)))
+   }
+   
+   DF_dlug <- data.frame(x=factor(c("Wybrany okres","2013"),
+                                  levels= c("Wybrany okres","2013")), 
+                         min=c(0,summary_dl["min"]), low=c(0,summary_dl["low"]), mid=c(0,summary_dl["med"]), 
+                         top=c(0,summary_dl["upper"]), max=c(0,summary_dl["max"]))
+   
+   DF_dlug[1,2:6] <-c(dane_dlug[1], dane_dlug[2],dane_dlug[3],dane_dlug[5],dane_dlug[6])
+   
+   DF_czas <- data.frame(x=factor(c("Wybrany okres","2013"),
+                                  levels= c("Wybrany okres","2013")), 
+                         min=c(0,summary_czas["min"]), low=c(0,summary_czas["low"]), mid=c(0,summary_czas["med"]), 
+                         top=c(0,summary_czas["upper"]), max=c(0,summary_czas["max"]))
+   
+   DF_czas[1,2:6] <-c(dane_czasy[1], dane_czasy[2],dane_czasy[3],dane_czasy[5],dane_czasy[6])
+   
+   p_dl <- ggplot(DF_dlug, aes(x=x, ymin = min, lower = low, middle = mid, upper = top, ymax = max)) +
+      geom_boxplot(stat = "identity", colour="#556270",fill="#4ECDC4") + ggtitle("Rozkład długości pojedynczej ścieżki") +
+      xlab("") + ylab("Ilość urządzeń")+ coord_cartesian(ylim = c(0, 30)) +
+      theme(axis.ticks=element_blank(), axis.text=element_text(size=12), axis.title = element_text(size=14))+
+      annotate("text", label = paste0("max: ", dane_dlug[6]), x = 1, y = 30, size = 4, colour = "black")   +
+      annotate("text", label = paste0("max: ",summary_dl["max"]), x = 2, y = 30, size = 4, colour = "black")
+   
+   
+   p_czas <- ggplot(DF_czas, aes(x=x, ymin = min, lower = low, middle = mid, upper = top, ymax = max)) +
+      geom_boxplot(stat = "identity",colour="#DB0A5B",fill="#EBC2C2")+ ggtitle("Rozkład czasu pojedynczej ścieżki") +
+      xlab("") + ylab("Czas w sek.")+ coord_cartesian(ylim = c(0, 5000)) +
+      theme(axis.ticks=element_blank(), axis.text=element_text(size=12), axis.title = element_text(size=14)) +
+      annotate("text", label = paste0("max: ", dane_czasy[6]), x = 1, y = 5000, size = 4, colour = "black")   +
+      annotate("text", label = paste0("max: ",summary_czas["max"]), x = 2, y = 5000, size = 4, colour = "black")
+   
+   # pusty wykres
+   df <- data.frame()
+   
+   dod <-ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 5000) +
+      theme( panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(),
+             panel.background = element_blank(),
+             panel.border=element_blank(),
+             axis.text.y=element_blank(),axis.ticks=element_blank(),
+             axis.text.x=element_blank()) + xlab("") + ylab("")+
+      annotate("text", label = paste0("liczba wybranych dni: ",length(dni), " z 324"), x = 5, y = 5000, size = 5, colour = "black") +
+      annotate("text", label = paste0("średnia długość ścieżki w 2013: ", round(summary_dl["mean"],2)), x = 5, y = 4500, size = 5,
+               colour = "black") +
+      annotate("text", label = paste0("średnia długość ścieżki w wybranym okresie: ", round(dane_dlug[4],2)), x = 5, y = 4000, 
+               size = 5, colour = "black") +
+      annotate("text", label = paste0("średni czas ścieżki w 2013: ", round(summary_czas["mean"]/60,2)," min"), x = 5, y = 3500, 
+               size = 5, colour = "black") +
+      annotate("text", label = paste0("średni czas ścieżki w wybranym okresie: ", round(dane_czasy[4]/60,2)," min"), x = 5, 
+               y = 3000, size = 5, colour = "black")
+   
+   
+   multiplot(p_dl,p_czas,dod , cols=3)
+}
+
+```
+
+
+## Funkcje do przetwarzania wybranych w opcjach aplikacji dni do zbioru zbioru rozumianego przez funkcję rysujBoxploty
+
+### wybraneDni_filter_data_byday 
+
+dla pierwszej opcji z aplikacji (wybór dni)
+
+```{r,eval=F}
+#' Funkcja służy do przetwarzania wybranych w opcjach aplikacji dni do zbioru
+#' dni rozumianych przez funkcję rysującą rysujBoxploty
+#' 
+#' @param days wektor zawierający skrajne wartości zakresu dni, które chcemy uwzględnić
+#' 
+#' @return zwraca wektor z datami typu dzień_miesiac (np. 21_02)
+#' 
+#' @export
+
+wybraneDni_filter_data_byday <- function(days){
+   
+   dates <- seq.Date(from = as.Date(days[1]), to = as.Date(days[2]), 
+                     by = 1)
+   
+   dates <- format(dates, format = "%d_%m")
+   
+   dates <- dates[dates %in% names(dane_all)]
+   
+}
+
+```
+
+
+### wybraneDni_filter_data
+
+dla drugiej opcji z aplikacji (wybór miesięcy i dni tygodnia)
+
+```{r,eval=F}
+#' Funkcja służy do przetwarzania wybranych w opcjach aplikacji miesięcy i dni tygodnia do zbioru
+#' dni rozumianych przez funkcję rysującą rysujBoxploty
+#' 
+#' @param weekdays wektor zawierający numeryczne wartości dni tygodnia,
+#' które chcemy uwzględnić
+#' 
+#' @param months wektor zawierający numeryczne wartości miesięcy,
+#' które chcemy uwzględnić
+#' 
+#' @return zwraca wektor z datami typu dzień_miesiac (np. 21_02)
+#' 
+#' @export
+
+wybraneDni_filter_data <- function(weekdays = c(1, 7), months = c(1, 12)){
+   
+   daty <- seq.Date(from = as.Date("2013-01-01"), to = as.Date("2013-12-31"), 
+                    by = 1)
+   
+   dni <- format(daty[as.numeric(format.Date(daty, format = "%u")) %in% 
+                         weekdays], format = "%d_%m")
+   
+   dni <- dni[(as.numeric(stri_sub(dni, 4, 5)) %in% months)]
+   
+}
+```
+
+# Ostateczne wersja aplikacji {#aplikacja}
+
+
+## plik ui.R
+```{r,eval=F}
+library(shiny)
+library(dplyr)
+library(stringi)
+library(png)
+library(sciezkiCNK)
+library(igraph)
+library(ggplot2)
+
+appTypes <- as.list(1:2)
+names(appTypes)<- c("Dni w roku oraz godziny",  "Miesiące, dni tygodnia oraz godziny")
+a <- "c"
+shinyUI(fluidPage(
+  titlePanel("Jak poruszamy się po ReGeneracji?"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput(inputId = "AppType",
+                  label = "Wybierz jak chcesz agregować ścieżki",
+                  choices = appTypes,
+                  selected = 1),
+      htmlOutput("SelektorDni"),
+      htmlOutput("SelektorMiesiaca"),
+      htmlOutput("SelektorMiesiacaCustom"),
+      htmlOutput("SelektorDniaTygodnia"),
+      htmlOutput("SelektorDniaTygodniaCustom"),
+      sliderInput(inputId = "godzina", 
+                  label = "Wybierz zakres godzin",
+                  min = 9,
+                  max = 20,
+                  value = c(9,20),
+                  step = 1,
+                  round = TRUE),
+      checkboxInput(inputId = "czySciezka",
+                    label = "Zaznacz typową ścieżkę z wybranego okresu (czerwona)",
+                    value = TRUE),
+      checkboxInput(inputId = "czySciezkaAll",
+                    label = "Zaznacz typową ścieżkę z całego roku (niebieska)",
+                    value = TRUE),
+      htmlOutput("SelektorDlugosciSciezki"),
+      hr(),
+      tags$div(class="header", checked=NA,
+               tags$p("Wybrana stacja:")),
+      htmlOutput("text"),
+      htmlOutput("click")
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("O mnie", {
+          tags$div(class="header", checked=NA,
+            tags$h1("Instrukcja obsługi"),
+            tags$p("Autorzy: Ewa Baranowska, Zofia Rogala, Bartosz Topolski"),
+            tags$p("Aplikacja służy do prezentacji ścieżek, po których poruszają się użytkownicy wystawy ReGeneracja w Centrum
+                 Nauki Kopernik. Ścieżki zaznaczone są na mapie jako proste linie między eksponatami, przy czym
+                   intensywność koloru ścieżku jest proporcjonalna do ilości użytkowników, którzy przeszli
+                   między danymi eksponatami. Ponadto, na mapie może być też zaznaczona najbardziej prawdopodobna
+                   droga, jaką obierze użytkownik wystawy podczas zwiedzania."),
+            tags$p("Użytkownik ma do wyboru dwie opcje agregacji danych:"),
+            tags$ul(
+              tags$li("'Dni w roku oraz godziny' - pozwala na wybranie zakresu dni według dat (lub pojedynczego dnia).
+                      "), 
+              tags$li("'Miesiące, dni tygodnia oraz godziny' - pozwala na wybranie konkretnych miesięcy
+                      i dni tygodnia.")),
+            tags$p("Obie opcje pozwalają ponadto na wybór interesujących nas godzin."),
+            tags$p("Wybierając agregację po dniach użytkownik ma do dyspozycji dwa elementy sterujące: wybór zakresu dni
+                   w formie kalendarza oraz wybór zakresu godzin w formie suwaka. W przypadku, kiedy użytkownik poda pierwszą datę późniejszą niż drugą, aplikacja
+                  automatycznie zamieni ich kolejność. "),
+            tags$p("Wybierając agregację po miesiącach i dniach tygodnia użytkownik ma do dyspozycji dwie listy rozwijane:
+                   jedna odpowiada za wybór dni tygodnia, druga za wybór miesiąca. Aplikacja zapewnia dostęp do kilku
+                   predefiniowanych zakresów, dostępna jest też jednak opcja samodzielnego ustalenia tych wartości ('Custom').
+                   Po jej wybraniu pojawia się lista checkboxów dla dni tygodnia, i suwak dla miesięcy. Tak 
+                   jak poprzednio, dostępny jest również zakres godzin w formie suwaka."),
+            tags$p("Przycisk 'Zaznacz typową ścieżkę z wybranego okresu' pozwala na rysowanie najbardziej prawdopodobnej drogi po wystawie
+                   ReGeneracja podczas okresu wybranego za pomocą kontrolek. Droga ta będzie oznaczona strzałkami w czerwonym kolorze. Zaznaczając tą opcję, pojawia się
+                   suwak odpowiadający za długość drogi, która zostanie narysowana."),
+            tags$p("Przycisk 'Zaznacz typową ścieżkę z całego roku' pozwala na rysowanie najbardziej prawdopodobnej drogi po wystawie
+                   ReGeneracja na podstawie danych z całego roku. Droga ta będzie oznaczona strzałkami w niebieskim kolorze. Jest ona 
+                   niezależna od wybranych parametrów."),
+            tags$p("Pod wszystkimi elementami sterującymi znajduje się pole zawierające informacje o
+                   stacji, która zostanie kliknięta przez użytkownika. Pokazywane są takie informacje jak numer, nazwa oraz 3 najczęściej wybierane
+                   kolejne stacje. Ponadto, po kliknięciu na stację na mapie zostają tylko ścieżki prowadzące z tej stacji, a typowa ścieżka
+                   zaczyna się od tej stacji."),
+            tags$p("Aby wyświetlić wykres, proszę przejść do zakładki 'Wykres'. Po każdej aktualizacji parametrów
+                   wykres zostaje narysowany ponownie."),
+            tags$p("Po klinięciu wybranej stacji, w zakładce 'Dane' pojawi się tabelka z prawdopodobieństwami przejścia z tej stacji do kolejnych."),
+            tags$p("W zakładce 'Statystyki' znajdują się dane dotyczące rozkładu czasu i długości pojedynczego przejścia, prezentowane za
+                   pomocą wykresów pudełkowych dla całego 2013 roku i dla wybranych dni. Obok wykresów podano średnie tych wielkości i
+                   ilość wybranych dni.")
+            )
+          }
+        ),
+        tabPanel("Wykres", plotOutput("sciezki", hover = "plot_hover", click = "plot_click")),
+        tabPanel("Dane", dataTableOutput("dataTable")),
+        
+        tabPanel("Statystyki", plotOutput("staty"))
+      )
+    )
+  )
+))
+
+```
+
+
+## plik server.R
+
+```{r,eval=F}
+weekdays <- as.list(c(2:7))
+names(weekdays) <- c("Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela")
+
+weekdays_choices <- as.list(c(1:4))
+names(weekdays_choices) <- c("Cały tydzień", "Wtorek - Piątek", "Sobota - Niedziela", "Custom")
+
+months_choices <- as.list(c(1:3))
+names(months_choices) <- c("Cały rok", "Wakacje (Lipiec - Sierpień)", "Custom")
+
+data(dane_all)
+data("doStatystyk")
+data("slownik_urz")
+data("mapka_png")
+rownames(slownik_urz) <- slownik_urz$nr
+slownik_urz %>% filter(x != 0) -> slownik_urz
+
+
+shinyServer(function(input, output, session) {
+   
+  v <- reactiveValues(
+     clicked = "---",
+     top = NULL,
+     str1 = NULL,
+     str2 = NULL,
+     dane_out = NULL
+  )   
+   
+  AppType <- reactive({
+    input$AppType
+  })
+  
+  observeEvent(input$plot_click,{
+    v$str1 <- findClosest(c(input$plot_click$x, 886 - input$plot_click$y), slownik_urz)[1]
+    v$str2 <- findClosest(c(input$plot_click$x, 886 - input$plot_click$y), slownik_urz)[2]
+    v$clicked <- stri_sub(findClosest(c(input$plot_click$x, 886 - input$plot_click$y), slownik_urz)[1],15,-1)
+  })
+
+  
+  selectedWeekDays <- reactive({
+     if(!is.na(AppType())){
+       if(AppType() == 2){
+         if(input$dzienTygodnia == 1) {return(2:7)}
+         if(input$dzienTygodnia == 2) {return(2:5)}
+         if(input$dzienTygodnia == 3) {return(6:7)}
+         if(input$dzienTygodnia == 4 & !is.null(input$dzienTygodniaCustom)) {
+           return(input$dzienTygodniaCustom)}
+       }
+       else {return(2:7)}
+     }
+  })
+  
+  selectedMonths <- reactive({
+    if(!is.na(AppType())){
+       if(AppType() == 2){
+         if(input$miesiac == 1) {return(1:12)}
+         if(input$miesiac == 2) {return(7:8)}
+         if(input$miesiac == 3 & !is.null(input$miesiacCustom)) {return(input$miesiacCustom[1]:input$miesiacCustom[2])}
+       }
+       else {return(1:12)}
+    }
+  })
+  
+  selectedPathLength <- reactive({
+    input$czySciezka
+  })
+  
+  output$dataTable <- renderDataTable(v$dane_out, options = list(pageLength = 10))
+  
+  
+  output$SelektorDni <- renderUI({
+     
+    if(!is.na(AppType())){
+       if(AppType() == 1){
+         dateRangeInput(inputId = "dzien", 
+                        label = "Wybierz zakres dni",
+                        start = "2013-01-01",
+                        end = "2013-12-31",
+                        min = "2013-01-01",
+                        max = "2013-12-31",
+                        weekstart = 1,
+                        language = "pl",
+                        separator = " do ")
+       }
+    }
+  })
+  
+  output$SelektorDniaTygodnia <- renderUI({
+     
+     if(!is.na(AppType())){
+       if(AppType() == 2){
+         selectInput(inputId = "dzienTygodnia", 
+                     label = "Wybierz zakres dni tygodnia",
+                     choices = weekdays_choices,
+                     selected = 1)
+       }
+     }
+  })
+  
+  output$SelektorDniaTygodniaCustom <- renderUI({
+     
+     if(!is.na(AppType())){
+       if(AppType() == 2){
+          if(!is.null(input$dzienTygodnia)){
+            if(input$dzienTygodnia == 4){
+              checkboxGroupInput(inputId = "dzienTygodniaCustom", 
+                                 label = "Wybierz dni tygodnia",
+                                 choices = weekdays,
+                                 selected = 2:7)
+            }
+          }
+       }
+     }
+  })
+  
+  output$SelektorMiesiaca <- renderUI({
+     
+     if(!is.na(AppType())){
+    if(AppType() == 2){
+      selectInput(inputId = "miesiac", 
+                  label = "Wybierz zakres miesięcy",
+                  choices = months_choices,
+                  selected = 1)
+    }
+     }
+  })
+  
+  output$SelektorMiesiacaCustom <- renderUI({
+     
+     if(!is.na(AppType())){
+       if(AppType() == 2){
+          if(!is.null(input$miesiac)){
+            if(input$miesiac == 3){
+              sliderInput(inputId = "miesiacCustom", 
+                          label = "Wybierz miesiące",
+                          min=1,
+                          max = 12,
+                          value = c(1,12),
+                          step = 1,
+                          round = TRUE)
+            }
+          }
+       }
+     }
+  })
+  
+  
+  output$SelektorDlugosciSciezki <- renderUI({
+     
+     if(!is.na(AppType())){
+    if(selectedPathLength()) {
+      sliderInput(inputId = "dlugoscSciezki", 
+                  label = "Wybierz długość ścieżki",
+                  min = 7,
+                  max = 35,
+                  value = 10,
+                  step = 1,
+                  round = TRUE)
+    }
+     }
+  })
+  
+  
+  output$text <- renderUI({
+    HTML(paste(v$str1, v$str2, sep = '<br/>'))
+    
+  })
+  
+  output$click <- renderUI({
+     HTML(paste('<br/>', "Najczęstsze kolejne eksponaty:", v$top[1], v$top[2], v$top[3], sep = '<br/>'))
+  })
+  
+  output$sciezki <- renderPlot({
+     
+    if(!is.null(AppType())){
+       if(!is.null(input$godzina) & (AppType() == 1 | (!is.null(selectedWeekDays()) & !is.null(selectedMonths())) ) ){
+       daty <- seq.Date(from = as.Date("2013-01-01"), to = as.Date("2013-12-31"), by = 1)
+       if(AppType() == 2){
+         filtr <- filter_data(weekdays = selectedWeekDays(), months = selectedMonths(), hours = input$godzina)
+       }
+       if(AppType() == 1){
+         if(input$dzien[2]>= input$dzien[1]) {
+           filtr <- filter_data_byday(days =input$dzien ,hours = input$godzina)
+         }
+         else filtr <- filter_data_byday(days = rev(input$dzien), hours = input$godzina)
+       }
+       filtr$from <- as.character(filtr$from)
+       filtr$to <- as.character(filtr$to)
+       sciezka_all <- sciezka(filter_data(), input$dlugoscSciezki, v$clicked) %>% filter(from %in% slownik_urz$nr, to %in% slownik_urz$nr)
+       sciezka <- sciezka(filtr, input$dlugoscSciezki, v$clicked)
+       sciezka <- sciezka %>% filter(from %in% slownik_urz$nr, to %in% slownik_urz$nr)
+       top <- 8
+       
+       rownames(slownik_urz) <- slownik_urz$nr
+       if(v$clicked != "---"){
+         filtr[filtr$from != v$clicked ,"total"] <- 0
+         v$dane_out <- filtr %>% 
+            filter(total>0, to != "---") %>% arrange(desc(total)) %>%
+            transmute(stacja = as.character(to), 
+                      p = paste0(round(total/sum(total)*100,2)," %"), 
+                      nazwa = slownik_urz[as.character(to), "nazwa"], 
+                      kategoria = slownik_urz[as.character(to), "kategoria"],
+                      total = total) %>% 
+            select(stacja, nazwa, kategoria, p, total)
+         top <- 2
+         a <- filtr$to[order(filtr$total, decreasing = TRUE)[1:4]]
+         a <- a[a != "---"]
+         v$top <- a
+       }
+       else {
+          v$top <- NULL
+          v$dane_out <- NULL
+       }
+       
+       if(max(filtr$total)!=0){
+         filtr$total <- filtr$total / sort(filtr$total, decreasing = T)[top]
+       }
+       filtr$total[filtr$total>1] <- 1
+       filtr$total <- filtr$total^1.3
+       rozmiary <- plot_mapa(mapka_png, obram=F)
+       plot_paths2(filtr, slownik_urz, col = "#160773")
+       
+       if(input$czySciezka){
+         plot_polaczenia_graph(data = sciezka , 
+                               slownik = slownik_urz, 
+                               alpha = 0.5, 
+                               czyStrzalki = T, 
+                               szerStrzalek = 2, 
+                               kolLinii = "#bf1010", 
+                               rozmiarStrzalek = 1 )
+       }
+       if(input$czySciezkaAll){
+         plot_polaczenia_graph(data = sciezka_all , 
+                                slownik = slownik_urz, 
+                                alpha = 0.5, 
+                                czyStrzalki = T, 
+                                szerStrzalek = 2, 
+                                kolLinii = "blue", 
+                                rozmiarStrzalek = 1,
+                                krzywLinii = -0.2)
+       }
+       plot_urzadz(slownik_urz, col = "#3a2e85", cex=3.7)
+       plot_etykiety_nr(slownik_urz, przes= c(0,0), cex = 0.9)
+       }
+    }
+   }
+   , height = 900, width = 800)
+  
+  output$staty <- renderPlot({
+     
+     if(!is.null(AppType())){
+        if(!is.null(input$godzina) & (AppType() == 1 | (!is.null(selectedWeekDays()) & !is.null(selectedMonths())) ) ){
+           daty <- seq.Date(from = as.Date("2013-01-01"), to = as.Date("2013-12-31"), by = 1)
+           if(AppType() == 2){
+              filtr <- wybraneDni_filter_data(weekdays = selectedWeekDays(), months = selectedMonths())
+           }
+           if(AppType() == 1){
+              if(input$dzien[2]>= input$dzien[1]) {
+                 filtr <- wybraneDni_filter_data_byday(days =input$dzien)
+              }
+              else filtr <- wybraneDni_filter_data_byday(days = rev(input$dzien))
+           }
+           
+           rysujBoxploty(filtr)
+           
+           
+        }
+     }
+  }
+  , height = 600, width = 1200)
+})
+
+```
+
+## strona www aplikacji
+
+Gotowa aplikacja dostępna jest pod adresem https://baranowskae.shinyapps.io/dodanie_apki_proba_1/.
+
