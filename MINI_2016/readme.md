@@ -52,7 +52,7 @@ Plan spotka&#324; MINI PW:
 * 18 IV [debugowanie kodu](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/debugowanie.html), [zrównoleglanie obliczeń](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/rownolegle.html)
 
 * 25 IV [HPC + hydra](https://rawgit.com/pbiecek/RandBigData/master/MINI_2015/materialy/hpc/hpc.html), [prezentacja projektu 1, faza 3](http://goo.gl/forms/VOo2cja4KU) 
-* 9 V [open CPU]
+* 9 V [open CPU](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/REST.html)
 * 16 V [wyjazdowo], prezentacja projektu 2, faza 1 
 * 23 V [spark]
 * 30 V [archivist], prezentacja projektu 2, faza 2
