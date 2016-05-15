@@ -1,0 +1,1 @@
+SLURM Job_id=2434535 Name=Gradziel_Rafal Ended, Run time 00:01:40, COMPLETED, ExitCode 0

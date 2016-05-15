@@ -44,15 +44,15 @@ Plan spotka&#324; MINI PW:
 
 * 29 II [scrapping](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_zeskrobywac_dane_ze_stron_www_uzywajac_pakietu.html), [czytanie z API](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_pobierac_dane_z_twittera.html), 
 * 7 III [GitHub](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_korzystac_z_serwisu_github_i_waffle.html), [Waffle](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_korzystac_z_serwisu_waffle.html), [dplyr](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/czyscic_przetwarzac.html)
-* 14 III [knitr, praca z bazami danych]
-* 21 III [shiny], 
+* 14 III [knitr](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_tworzyc_raporty.html), [praca z bazami danych](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_pracowac_z_bazami_danych.html), [zabawka](https://github.com/pbiecek/RandBigData/blob/master/MINI_2015/materialy/bazy_danych/zabawka.db)
+* 21 III [Shiny](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_tworzyc_aplikajce.html), [ekstra link 1](http://bit.ly/1LAlBKE), [ekstra link 2](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/wynikiDF.rda), [ekstra link 3](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/wynikiDF.csv.zip)
 * 22 III [prezentacja projektu 1, faza 1, zamiast zajęć czwartkowych]
-* 4 IV [tworzenie pakietów z R]
-* 11 IV [profilowanie, debugowanie kodu], prezentacja projektu 1, faza 2
-* 18 IV [zrównoleglanie obliczeń]
+* 4 IV [tworzenie pakietów z R](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pakiety/po_co.html)
+* 11 IV [profilowanie](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/profilowanie.html), prezentacja projektu 1, faza 2
+* 18 IV [debugowanie kodu](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/debugowanie.html), [zrównoleglanie obliczeń](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/rownolegle.html)
 
-* 25 IV [HPC + hydra], prezentacja projektu 1, faza 3 
-* 9 V [open CPU]
+* 25 IV [HPC + hydra](https://rawgit.com/pbiecek/RandBigData/master/MINI_2015/materialy/hpc/hpc.html), [prezentacja projektu 1, faza 3](http://goo.gl/forms/VOo2cja4KU) 
+* 9 V [open CPU](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/REST.html)
 * 16 V [wyjazdowo], prezentacja projektu 2, faza 1 
 * 23 V [spark]
 * 30 V [archivist], prezentacja projektu 2, faza 2
