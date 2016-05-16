@@ -53,7 +53,7 @@ Plan spotka&#324; MINI PW:
 
 * 25 IV [HPC + hydra](https://rawgit.com/pbiecek/RandBigData/master/MINI_2015/materialy/hpc/hpc.html), [prezentacja projektu 1, faza 3] 
 * 9 V [open CPU](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/REST.html)
-* 16 V [ankieta](http://goo.gl/forms/VOo2cja4KU), prezentacja projektu 2, faza 1 
+* 16 V [ankieta](http://goo.gl/forms/iWtckYi7Hc), prezentacja projektu 2, faza 1 
 * 23 V [spark]
 * 30 V [archivist], prezentacja projektu 2, faza 2
 * 6 VI [sparkR]
