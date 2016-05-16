@@ -7,7 +7,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
 
 <meta name="author" content="Przemyslaw Biecek" />
 
@@ -39,25 +39,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 
 
 
-
-</head>
-
-<body>
-
 <style type="text/css">
-.main-container {
-  max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-img {
-  max-width:100%;
-  height: auto;
-}
 h1 {
   font-size: 34px;
 }
@@ -78,6 +60,30 @@ h5 {
 }
 h6 {
   font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type="text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -108,7 +114,8 @@ $(document).ready(function () {
 <div class="fluid-row" id="header">
 
 
-<h1 class="title">Jak korzystac z webserwisow</h1>
+
+<h1 class="title toc-ignore">Jak korzystac z webserwisow</h1>
 <h4 class="author"><em>Przemyslaw Biecek</em></h4>
 <h4 class="date"><em>6 May 2016</em></h4>
 
@@ -172,7 +179,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[1]]$id
-## [1] &quot;a1fa&quot;
+## [1] &quot;a63fb8&quot;
 ## 
 ## $elements[[1]]$type
 ## [1] &quot;w&quot;
@@ -207,7 +214,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[2]]$id
-## [1] &quot;a1f7&quot;
+## [1] &quot;a63fb5&quot;
 ## 
 ## $elements[[2]]$type
 ## [1] &quot;w&quot;
@@ -242,7 +249,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[3]]$id
-## [1] &quot;a1f8&quot;
+## [1] &quot;a63fb6&quot;
 ## 
 ## $elements[[3]]$type
 ## [1] &quot;w&quot;
@@ -277,7 +284,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[4]]$id
-## [1] &quot;a1fb&quot;
+## [1] &quot;a63fb9&quot;
 ## 
 ## $elements[[4]]$type
 ## [1] &quot;w&quot;
@@ -312,7 +319,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[5]]$id
-## [1] &quot;a1fc&quot;
+## [1] &quot;a63fba&quot;
 ## 
 ## $elements[[5]]$type
 ## [1] &quot;w&quot;
@@ -347,7 +354,7 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## NULL
 ## 
 ## $elements[[6]]$id
-## [1] &quot;a1f9&quot;
+## [1] &quot;a63fb7&quot;
 ## 
 ## $elements[[6]]$type
 ## [1] &quot;w&quot;
@@ -376,13 +383,13 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## [1] &quot;VG&quot;
 ## 
 ## $elements[[7]]$semHeadId
-## [1] &quot;a1f8&quot;
+## [1] &quot;a63fb6&quot;
 ## 
 ## $elements[[7]]$synHeadId
-## [1] &quot;a1f7&quot;
+## [1] &quot;a63fb5&quot;
 ## 
 ## $elements[[7]]$id
-## [1] &quot;a1fd&quot;
+## [1] &quot;a63fbb&quot;
 ## 
 ## $elements[[7]]$type
 ## [1] &quot;g&quot;
@@ -411,19 +418,31 @@ content(nlp, &quot;parsed&quot;)</code></pre>
 ## [1] &quot;NG&quot;
 ## 
 ## $elements[[8]]$semHeadId
-## [1] &quot;a1fc&quot;
+## [1] &quot;a63fba&quot;
 ## 
 ## $elements[[8]]$synHeadId
-## [1] &quot;a1fc&quot;
+## [1] &quot;a63fba&quot;
 ## 
 ## $elements[[8]]$id
-## [1] &quot;a1fe&quot;
+## [1] &quot;a63fbc&quot;
 ## 
 ## $elements[[8]]$type
 ## [1] &quot;g&quot;</code></pre>
 <p><a href="https://github.com/morfologik/" class="uri">https://github.com/morfologik/</a></p>
 <p>Kategorie gramatyczne dla mds</p>
 <p><a href="http://nlp.ipipan.waw.pl/CORPUS/znakowanie.pdf" class="uri">http://nlp.ipipan.waw.pl/CORPUS/znakowanie.pdf</a></p>
+</div>
+<div id="alternatywa" class="section level2">
+<h2>Alternatywa</h2>
+<p>Jeżeli nie uda wię wyłączyć weryfikacji SSL, pozostaje korzystanie bezpośrednio z zewnętrznego programu curl.</p>
+<pre class="r"><code>output &lt;- system('curl -H &quot;Content-Type: application/json&quot; -k -X POST -d \'{&quot;message&quot;:{&quot;body&quot;:&quot;gotofy do prob?&quot;},&quot;token&quot;:&quot;2$zgITnb02!lV&quot;}\' https://ec2-54-194-28-130.eu-west-1.compute.amazonaws.com/ams-ws-nlp/rest/spell/single', intern=TRUE)
+
+jsonlite::fromJSON(output)</code></pre>
+<pre><code>## $output
+## [1] &quot;gotowy do prób?&quot;
+## 
+## $error
+## NULL</code></pre>
 </div>
 
 
