@@ -1,0 +1,56 @@
+Opis aplikacji, pakiet i sama aplikacja (pomijając lewe menu) są dopracowane.
+W pakiecie jest dużo dokumentacji, krótkie funkcje – same plusy, szkoda jedynie, że pakiet się u mnie nie instaluje.
+
+W kolejnym kroku sugerowałbym uproszczenie menu po lewej stronie i rozszerzenie ilości prezentowanych informacji (które są liczone ale nie prezentowane), takie jak macierz przejść, informacją o wybranym eksponacie itp. 
+Jeżeli pozwalać na wybór dnia/godziny do porównań to koniecznie z prezentacją wyników, taką która pozwoli uchwycić różnice.
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Opis i w pliku 'faza2_opis' i w pliku 'readme' jest naprawdę bardzo dobry.
+Warto jednak dodać do niego i spis treści i krótkie streszczenie.
+Spis treści (dodaje się automatycznie) pozwoli na szybkie poruszanie się po dokumencie. 
+Streszczenie ułatwi orientacje czemu on ma właściwie służyć.
+
+Pakiet mógłby dodatkowo zawierać testy, teraz ich nie ma.
+Pakiet nie wygląda na duży. A w takim wypadku lepiej go umieścić go w naszym repozytorium w swoim katalogu z pierwszym projektem.
+
+Wykres jest bardzo ciekawy, ale należy go obudować zestawem statystyk, ułatwiających jego zrozumienie.
+Przynajmniej z zakładka z macierzą przejścia, zakładką z typową ścieżką.
+
+
+Niestety próba instalacji pakietu u mnie się nie powiadał.
+Mam błąd 'Error in nchar(text) : invalid multibyte string, element 1'
+Być może to kwestia kodowania polskich znaków (powinny być UTF-8).
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Budowa macierzy przejścia i sposób prezentacji są bardzo ciekawe.
+
+Mam jedynie niedosyt dotyczących rzeczy, które są policzone, ale których nie mogę odczytać.
+Np, dla ścieżek chciałbym wiedzieć jak są popularne. Teraz jest półprzezroczystość – super, ale wciąż trudno odczytać ile było tych przejść i czy są normalizowane.
+Teraz po lewej jest nazwa eksponatu, a można dla eksponatu pokazać też top 5 najczęściej odwiedzanych później wraz z procentami.
+
+Ciekawą opcją byłoby też wystartowanie 'typowej ścieżki' nie tylko od 02b ale od dowolnego klikniętego eksponatu
+
+Bardzo podoba mi się użycie mapy jako interface - reagującego na ruch myszki.
+Ale należy ten pomysł dalej eksploatować.
+Jak już ktoś wyświetli eksponat to poza nazwą pokazujmy też np. histogram czasu odwiedzin tego eksponatu (w menu po lewej),
+lub inne uzupełniające informacje o tym eksponacie.
+
+
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+I w raportach i przy aplikacji proszę ZAWSZE umieszczać informację o autorach.
+
+I pakiet i raport są czytelne.
+Do raportu może warto dodać wnioski?
+
+Wykres z macierzą przejścia mi się podoba.
+Ale interface po lewej stronie jest mało czytelny. 
+Dużo w nim opcji, ale trudno odczytać czym różnią się wyniki dla różnych dni tygodnia czy miesięcy.
+Może analizy porównawcze przedstawić inaczej (odnieść wybraną grupę do wszystkich pozostałych, pokazać ile więcej jest przejść w danym obszarze).
+

@@ -1,0 +1,1 @@
+SLURM Job_id=2407299 Name=R&BD_Zofia_Rogala Ended, Run time 00:00:04, COMPLETED, ExitCode 0
