@@ -9,6 +9,6 @@ LazyData: true
 Imports: stringi, RSQLite
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2016-04-07 09:46:15 UTC; michal
+Packaged: 2016-04-24 10:28:48 UTC; michal
 Author: First Last [aut, cre]
 Maintainer: First Last <first.last@example.com>
