@@ -1,0 +1,47 @@
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Pakiet wykonany bardzo dobrze.
+Dużo funkcji, 
+odpowiednio udokumentowane, 
+są testy,
+jest opis pakietu oraz informacja o autorach,
+nieliczne niedopracowania (np. brak informacji o licencji) generalnie bardzo dobrze.
+
+
+Aplikacja jest przeciętna. 
+Nie ma informacji o autorach. 
+Nie ma żadnych komentarzy, co robi która funkcja.
+Nie ma fajerwerków jeżeli chodzi o style, grafikę, layout czy efektywność przetwarzania.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Próbowano wielu różnych podejść, tutaj punkty za różnorodność sposobów prezentowania danych.
+
+Prezentowane analizy nie są zaawansowane modelarsko, są to średnie lub częstości w grupach.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Co jakiś czas pojawia się jakiś błąd
+'length(podaj.rok) < 3 is not TRUE'
+
+Prezentowane analizy nie są czytelne i są opisane w sposób, który nie ułatwia ich interpretacji.
+
+Bardzo trudno jest mi powiedzieć co wynikać z tych analiz.
+
+Jedyne wyniki, dla których widzę jakieś zastosowanie to histogram długości ścieżek.
+
+Wykresy są mało zrozumiałe.
+
+Rozbijanie wyników osobno dla różnych dni to też nienajlepszy pomysł.
+Trudno określić, czy obserwowana zależność jest uniwersalna czy akurat tak się trafiło danego dnia.
+
+
+Punktacja: 
+
+Ad 1: 90%
+Ad 2: 75%
+Ad 3: 50%
+
