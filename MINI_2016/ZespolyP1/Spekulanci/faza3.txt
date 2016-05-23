@@ -27,8 +27,6 @@ Budowanie macierzy przejść, która jest w pakiecie, powinno być zamknięte w 
 Ścieżki do plików nie powinny być bezwzględne ale względne.
 Zamiast wklejać same pliki png, powinien być też kod R, który te wykresy tworzy.
 
-Aplikacja u mnie nie działa i nie jest poprawiona.
-
 
 2. Pomysłowość i zaawansowanie metod modelowania danych.
 
@@ -53,7 +51,7 @@ Opis 'Na mapkę naniesione zostały najbardziej lub najmniej popularne ścieżki
 
 Punktacja: 
 
-Ad 1: 50%
+Ad 1: 60%
 Ad 2: 90%
 Ad 3: 80%
 
