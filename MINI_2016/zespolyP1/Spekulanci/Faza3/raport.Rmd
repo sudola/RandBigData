@@ -1,0 +1,295 @@
+---
+title: "Popularne ścieżki - raport"
+output: html_document
+---
+
+##Spis treści
+- [Macierz przejścia i wstępna analiza](#100)
+- [Najpopularniejsze ścieżki](#101)
+
+
+
+<div id='100'/>
+##Macierz przejścia i wstępna analiza
+
+W celu analizy najpopularniejszych ścieżek po Re:generacji utworzyliśmy macierz przejść pomiędzy eksponatami. Tworząc tą macierz uwzględnialiśmy logowania trwające co najmniej 5 sekund, ponieważ uznaliśmy, że krótsze interakcje nie pozwalają na zapoznanie się z stanowiskiem, a szukamy ścieżek zawierających najbardziej atrakcyjne eksponaty.
+
+
+
+Jej fragment wygląda następująco:
+
+![Macierz przejścia](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\macierzprzejscia.png)
+
+Na podstawie macierzy przejścia dla każdego stanowiska nanieśliśmy najbardziej popularne kierunki.
+
+![Popularne kierunki](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\mapka2.jpg)
+
+Można zauważyć, że zwiedzający najczęściej kierują się do najbliższych eksponatów. Kolorem zielonym zaznaczyliśmy eksponat, od którego zwiedzający najczęściej zaczynają. Jest to eksponat **cnk02b** czyli **Mózg podczas pracy** . Z kolei eksponat, na którym najczęsciej kończono zwiedzanie to __Sala Strachów__ - zaznaczony na czerwono.
+Przeprowadzając analizę szukaliśmy eksponatów, do których mimo bliskiej odległości kieruje się mało użytkowników. Mogłoby to wskazywać na złe umiejscowienie eksponatu lub jego małą atrakcyjność. 
+Chcieliśmy przeprowadzić analizę polegającą na sprawdzeniu, czy któryś z eksponatów jest pomijany przy przejściu od jego sąsiadów.
+W tym celu utworzyliśmy tabelkę, w której dla wybranego stanowiska umieszczamy pozycję popularności wśród trzech najbliższych sąsiadów. Pierwszy blok tabeli jest wyliczany na podstawie względnej odległości, czyli z uwzględnieniem ścian, natomiast drugi jest wyliczony z pominięciem ścian. Uporządkowaliśmy wyniki według malejącego minima sposród pozycji u sąsiadów, aby przyjrzeć się eksponatom podejrzanym o złe umiejscowienie.
+
+![1](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\1.png)
+
+Przyjrzyjmy się paru stanowiskom, które odbiegają od normy.
+Pierwszy z nich to __cnk19b__, czyli __Sala strachów wyjście__. Dalekie pozycje wśród sąsiądów wynikają z tego, że jest to wyjście z eksponatu __Sala strachów__, a wejście do tego eksponatu nie znajduje się w trzech najlbiższych stanowiskach. Jeżeli rozszerzymy promień tak, aby wejście się w nim znalazło, pojawi się jedynka.
+Niska popularność wśród sąsiadów eksponatów __cnk36__, czyli __Zsieciowani__ i __cnk63a__, czyli __Przesyłka do gwiazd__ nas nie dziwi, ponieważ są to dwa najrzadziej odwiedzane eksponaty w galerii.
+Do ciekawych wniosków możemy dojść przyglądając się eksponatowi __cnk25__, czyli __Rodzinny interes__. W rankingu najrzadziej odwiedzanych eksponatów zajmuje dopiero 19stą pozycję, a wśród sąsiadów cieszy się małą popularnością. Aby dokładniej przeanalizować to stanowisko, wypisaliśmy pozycję __Rodzinnego interesu__ wśród wszystkich eksponatów, zaczynając od najbliższego.
+
+![2](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\2.png)
+
+Jak widać, zwiedzający raczej omijają ten eksponat, bez względu na to, gdzie się znajdują. Możemy przypuszczać, że jest to spowodowane kiepskim położeniem eksponatu, który ograniczony jest ścianami i jest cięzko dostępny.
+
+
+<div id='101'/>
+## Najpopularniejsze ścieżki
+
+#Spis treści
+- [Streszczenie](#1)
+- [Wstęp](#2)
+- [Motywacja i uzasadnienie](#3)
+- [Najpopularniejsze ścieżki](#4)
+- [Podsumowanie](#5)
+
+
+<div id='1'/>
+#Streszczenie
+
+W raporcie tym została przeprowadzona analiza wyboru najpopularniejszej ścieżki. 
+Za pomocą testów pokazano niemarkowskość zakładanego problemu, następnie umotywowano swoje podejście do Niego i jego rozwiązanie za pomocą analizy ścieżek o długości nie większej niż cztery.
+
+<div id='2'/>
+#Wstęp
+
+Do problemu wyszukania najpopularniejszej ścieżki można podchodzić na różne sposoby. Większość grup opiera się na danych otrzymanych za pomocą "jednokrokowej macierzy przejścia" - tzn. zliczeniu przejść bezpośrednio z jednego eksponatu do innego. O ile taka analiza pokazuje jak ludzie poruszają się bezpośrednio po kolejnych eskponatach, o tyle nijak ma się do kroków wykonywanych przez nich później- co udowodniliśmy zarówno empirycznie jak i matematycznie w naszej pracy.
+
+W swojej pracy zastsowowaliśmy podejście bezpośrednie- zliczyliśmy wszystkie ścieżki dla każdej pary, trójki oraz czwórki i na tym oparliśmy dalszą analizę. W przypadku 5 i więcej eksponatów problem zaczyna się robić bardzo złożony ze względu na złożoność algorytmu działającego w tym celu - np. chcąc wyszukać najpopularniejszą ścieżkę zawierającą 5 eksponatów (nie skłądającej się wyłącznie z tych eksponatów), musielibyśmy zliczyć ilość zwiedzeń dla 5006386 kombinacji - czas działania takiego programu jest bardzo długi. Dlatego w analizie ścieżek długości większej niż 4 odeszliśmy od bezpośredniego podejścia do problemu.
+
+<div id='3'/>
+#Motywacja i uzasadnienie
+
+Jak wspomniane zostało na wstępie uzasadnimy dlaczego podejście do problemu wyszukiwania najpopularniejszej ścieżki za pomocą macierzy jednokrokowej jest błędne.
+Opierając się na tym pomyśle zakładamy, że zwiedzający poruszając się po kolejnych eksponatach biorą pod uwagę tylko fakt, w którym eksponacie obecnie się znajdują - można by więc opisać ścieżkę zwiedzającego za pomocą łańcucha Markowa z obliczoną przez nas jednokrokową macierzą przejścia. 
+Przeprowadziliśmy testy w których weryfikujemy zgodność naszego założenia (o markowskości) z faktycznymi danymi. Nasza analiza została przeprowadzona w następujący sposób- policzyliśmy z naszych danych rzeczywiste k-krokowe macierze przejścia (tzn. do jakich eksponatów udają się zwiedzający w k-tym kroku, k=1,2,...,10). Analogicznie liczymy k-te macierze uwzgledniając założenie o markowskości (tzn. podnosimy naszą jednokrokową macierz do odpowiedniej potęgi). Następnie testem chi kwadrat porównywać będziemy zgodności rozkładów dla każdego wiersza dla każdej k-krokowej macierzy.
+
+Wyniki (fragment) prezentuje się następująco (kolejne wiersze to porównanie macierzy k-krokowych, kolumny zaś zawierają wartość statystyki testu chi kwadrat zgodności rozkładów dla odpowiednich eksponatów).
+
+```{r,eval=FALSE,echo=FALSE}
+setwd("C:/Users/Rafał/Desktop/Projekt R/Faza 2")
+
+library(dplyr)
+library(RSQLite)
+
+sterownik <- dbDriver("SQLite")
+polaczenie <- dbConnect(sterownik, "dane.db")
+dbListTables(polaczenie)
+
+logi=dbReadTable(polaczenie, "logiCNK")
+
+n=length(unique(logi$hostname))
+
+posort=logi%>%filter(duration>=5)%>%group_by(year,month,day,user)%>%arrange(time)
+#sortujemy i tworzymy macierz przejsc
+
+dlug=nrow(posort[,1])
+
+ramka1=posort[-dlug,]
+ramka2=posort[-1,]
+names(ramka2)=c("year2","month2",  "day2" , "time2", "duration2","user2", "hostname2")
+
+razem=cbind(ramka1,ramka2)
+
+wynik=razem%>%filter(user==user2)%>%select(hostname,hostname2)%>%group_by(hostname,hostname2)%>%summarise(ile=n())
+
+m=matrix(0,nrow=n,ncol=n)
+m=as.data.frame(m)
+names(m)=unique(logi$hostname)
+rownames(m)=unique(logi$hostname)
+
+dl=length(wynik$hostname)
+
+for (i in 1:dl)
+{
+	m[wynik$hostname[i],wynik$hostname2[i]]=wynik$ile[i]
+}
+
+for (i in 1:59)
+{
+	m[i,]=m[i,]/sum(m[i,])
+}
+
+macierz=as.matrix(m)
+#mamy jednokrokowa macierz przejsc
+
+#Zbudujmy macierz n-tych krokow
+
+testy=lapply(1:10,function(x){as.numeric(0)})
+
+for (k in 1:10)
+{
+	ramka12=posort[-(dlug:(dlug-k+1)),]
+	ramka22=posort[-(1:k),]
+	names(ramka22)=c("year2","month2",  "day2" , "time2", "duration2","user2", "hostname2")
+	razem2=cbind(ramka12,ramka22)
+	wynik2=razem2%>%filter(user==user2)%>%select(hostname,hostname2)%>%group_by(hostname,hostname2)%>%summarise(ile=n())
+	
+	m2=matrix(0,nrow=n,ncol=n)
+	m2=as.data.frame(m2)
+	names(m2)=unique(logi$hostname)
+	rownames(m2)=unique(logi$hostname)
+	
+	dl=length(wynik$hostname)
+	
+	for (i in 1:dl)
+	{
+		m2[wynik2$hostname[i],wynik2$hostname2[i]]=wynik2$ile[i]
+	}
+	
+	testy[[k]]=m2
+}
+
+markow=lapply(1:10,function(x){as.numeric(0)})
+markow[[1]]=macierz
+
+for (k in 2:10)
+{
+	markow[[k]]=macierz%*%markow[[k-1]]
+}
+
+pstwa=matrix(0,ncol=n,nrow=10)
+for (k in 1:10)
+{
+	for (j in 1:n)
+	{
+		mar1=as.vector(markow[[k]][j,])
+		tes1=as.numeric(testy[[k]][j,])
+		pstwa[k,j]=round(chisq.test(tes1,p=mar1)$statistic,digits = 10)
+	}
+}
+colnames(pstwa)=unique(logi$hostname)
+rownames(pstwa)=1:10
+save(pstwa,file="pstwa")
+```
+
+![Testy](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\testy.png)
+
+
+Zera w pierwszym wierszu nie dziwią- macierze jednokrokowe uzyskane zostały w ten sam sposób, zatem są idealnie zgodne (wartości wynoszące 0 mówią o przyjęciu hipotezy zerowej, która w teście chi kwadrat zakłada zgodność rozkładów). Dopiero w dalszej części tabeli możemy zauważyć spore rozbieżności pomiędzy badanymi przez nas rozkładami- wartość statytsyki testu chi-kwadrat osiąga nawet około 20 tysięcy, co jest bardzo dużą liczbą. Możemy więc z całą pewnością stwierdzić iż założenie o markowskości naszych danych byłoby błędem.
+
+<div id='4'/>
+#Najpopularniejsze ścieżki
+
+Na wstępie przypomnijmy, że analizę robimy tylko dla eksponatów, w których użytkownicy przebywali dłużej niż 5 sekund - tylko te uznaliśmy za warte uwagi. Dodatkowo jak stwierdziliśmy wcześniej, eksponat **nr cnk19a - Sala Strachów**, który był dostępny tylko w latach 2012-2014, mimo i tak zdecydowanie największej ilości odwiedzeń ze wszystkich, może nie znaleźć się wśród najpopularniejszych ścieżek właśnie z powodu braku danych w jednym roku- należy zatem pamiętać, że zapewne gdyby nie został wyłączony z użycia znalazłby się wśród najpopularniejszych ścieżek. Obliczenia jednak przeprowadzimy dla naszych danych, nie uwzględniając specjalnie braków na wyżej wymienionym eksponacie.
+
+Sprawdźmy ilośc odwiedzeń poszczególnych eksponatów:
+
+```{r,eval=FALSE,echo=FALSE}
+setwd("C:/Users/Rafał/Desktop/Projekt R/Faza 2")
+grupy=read.table("C:/Users/Rafał/Desktop/Projekt R/Faza 2/Grupy_stanowisk.txt",h=TRUE)
+load("nazwy")
+n=length(nazwy)
+
+pojedyncze=matrix(nrow = n,ncol=2)
+pojedyncze=as.data.frame(pojedyncze)
+names(pojedyncze)=c("Id_1","ile")
+
+for (i in 1:n)
+{
+		pojedyncze[i,1]=nazwy[i]
+		pojedyncze[i,2]=grupy%>%filter(grupy[,(i+6)]==TRUE)%>%summarise(ile=n())
+}
+save(pojedyncze,file="pojedyncze")
+```
+
+![3](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\3.png)
+
+
+Daje się zatem zauważyć, że występują wprawdzie eksponaty odwiedzane sporo częściej niż inne- jak **cnk19a - Sala Strachów**, **cnk16 - Powąchaj mnie**, **cnk10 - Koń by się uśmiał**. Istnieją także eksponaty niezbyt popularne, jak **cnk36 - Zsieciowani**, **cnk63a - Przesyłka do gwiazd**, **cnk29a - Robot portrecista**, jednak jak wspominaliśmy już wcześniej - pierwsze dwa zostały usunięte w 2014 roku, zaś eksponat **Robot portrecista** jest eksponatem z długim czasem oczekiwania na interkację.
+
+Zajmijmy się teraz policzeniem popularności ścieżek dla każdej pary:
+
+10 najbardziej popularnych ścieżek to:
+
+![4](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\4.png)
+
+
+Widzimy więc, że para **cnk19a - Sala strachów (wejście)** i **cnk19b - Sala strachów (wyjście)** występuje w największej ilości ścieżek i co więcej- ilość występowań konkretnej pary dla pozostałych wyborów rozkłada się w miarę jednostajnie od wartości około 2 tysiący do około 120 tysięcy, jedynie wyżej wymieniona para zdecydowanie "odstaje" od tychże danych.
+Jednak istnieje na to logiczne wytłumaczenie - jest to tak naprawdę jeden eksponat - **Sala Strachów**, w którym czytniki kart są ustawione zarówno na wejściu jak i wyjściu.
+
+Jak zauważyliśmy wcześniej (dla pojedynczych eksponatów) można by wyróżnić konkretne grupy par ze względu na odwiedziny, jednak my zajmiemy się tylko ścieżkami najczęściej występującymi na trasach zwiedzających.
+
+Z tabeli dla par widzimy, że 3 najczęściej uczęszczane pary to (3 to subiektywna liczba):
+
+-**cnk09 (Sztuka i emocje) - cnk16 (Powąchaj mnie)**
+
+-**cnk16 (Powąchaj mnie) - cnk19a (Sala Strachów)**
+
+-**cnk12 (Sztuczny czy szczery) - cnk16 (Powąchaj mnie)**
+
+Występowanie w nich eksponatów numer 16 i 19 nie dziwi ze względu na to, iż są to 3 najczęściej odwiedzane eksponaty. 
+Ważna jest jednak analiza z uwzględnieniem wcześniej podanej przez nas macierzy przejścia, o której pisaliśmy, że nie jest "miarodajna" ze względu na rozpatrywanie tylko bezpośrednich "przejść" pomiędzy eksponatami. Patrząc na tę macierz otrzymujemy, że ścieżka z eksponatu **nr 19a** do **nr 16** jest drugim najczęściej obieranym kierunkiem (**nr 11** najpopularniejszy), zaś **nr 16** do **nr 19a** - 10, z eksponatu **nr 16** najczęściej idą do **nr 12**, zaś z ścieżka z **nr 12** do **nr 16** jest 7 wyborem. Te dane mogą wskazywać, że rozpatrując macierz przejścia do znajdowania najpopularniejszej pary, obydwie również zostałaby uwzględnione. Jednak przejście z **nr 9** do **nr 16** jest na 4 pozycji, zaś z **nr 16** do **nr 9** - dopiero na 11. Bardzo mało prawdopodobnym jest więc, aby ścieżka ta została określona jako popularna za pomocą wyżej wspomnianej macierzy. 
+
+Z danych widać także, że tylko jedna z 6 najpopularniejszych ścieżek jest również najpopularniejszym jednokorokowym przejściem z jednego eksponatu na drugi (**16 -> 12**).
+Prostą konkluzją jest więc stwierdzenie, że wysnuwanie wniosków o najczęściej uczęszczanych ścieżkach za pomocą jednokrokowej macierzy przejścia jest błędem. Zatem fakt stwierdzony testami zostaje również potwierdzony empirycznie.
+
+Przeanalizujmy teraz najpopularniejsze trójki:
+
+![5](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\5.png)
+
+
+Otrzymujemy, że zdecydowanie najpopularniejszą ścieżką jest **cnk16 (Powąchaj mnie) - cnk19a (Sala strachów (wejście)) - cnk19b (Sala strachów (wejście))**, której jednak nie uwzględniamy, o czym wspominaliśmy wcześniej. Zdecydowana większość z 20 najpopularniejszych trójek stanowią ciągi zawierające **cnk19a (Sala strachów (wejście)) - cnk19b (Sala strachów (wejście))**. Spójrzmy zatem na tę tabelę nie uwzględniając tej pary:
+
+![6](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\6.png)
+
+Patrząc na całą tabelkę z ilością występowań danych trójek widać, że daje się wyznaczyć konkretne grupy, ciężko jednak stwierdzić które są najczęściej uczęszczane - na pewno trójka **cnk12-cnk16-cnk66** jest warta uwagi, jednak równie dobrze można by rozpatrywać **cnk12-cnk16-cnk21**,**cnk09-cnk12-cnk16**,**cnk12-cnk16-cnk20**, gdyż różnią się o mniej niż 10% od największej. 
+Warto by także zastanowić się nad eksponatami **cnk09 (Sztuka i emocje)**, **cnk12 (Sztuczny czy szczery)**, **cnk16 (Powąchaj mnie)**, **cnk66 (Przesłyszałes się)**, **cnk21 (Młodzi fotografowie)** oraz **cnk20 (Zrób sobie tatuaż)**. Pojawiają się one najczęściej ze wszystkich w powyższej tabeli, co może sugerować, iż należy się spodziewać, że będą wchodzić skłąd najpopularniejszych czwórek. Warto także nadmienić, iż o ile pierwsze cztery z wyżej wymienionych wchodzą w skład najpopularniejszych czwórek, o tyle ostatnie dwa wydają się nowe w tym zestawieniu.
+Dodatkowo nr **9, 20, 21 i 66** zajmują kolejno **8, 16, 20 i 17** miejsce w rankingu najczęściej odwiedzanych, co dowodzi, iż analiza opierająca się na samej tabeli podającej ilość odwiedzin dla każdego eksponatu byłaby błędna.
+Zastanówmy się także chwilę nad wspominanym przez nas wcześniej i najczęściej odwiedzanym eksponacie - Sali Strachów (nr 19). Należy ona dopiero do 11 (!) najpopularniejszej trójki (po wyrzuceniu "powtórzeń"), co może dziwić gdyby nie fakt, iż eksponat ten został wyłączony z trasy zwiedzania w 2014 roku- dlatego też występuje w mniejszej ilości trójek niż przypuszczalnie występowałby- co zauważyliśmy na wstępie.
+
+Cała tabela daje powody by sądzić, że nie ma jednej bądź kilku najpopularniejszych ścieżek- można je jedynie pogrupować.
+
+Przeprowadźmy teraz analizę dla czwórek:
+
+![7](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\7.png)
+
+Znowu można zauważyć pojawiającą się parę **19a - 19b**, pomijając ją jednak otrzymujemy wynik przez nas oczekiwany- w najpopularniejszych czwórkach zawierają się eksponaty o numerach **9, 12, 16, 20, 21 oraz 66**. Mamy także nowe jak **cnk05 - Strojenie mózgu**, **cnk11 - Manipulator emocji** i **cnk17 - Otwartość na doświadczenie**. Znowu nie możemy stwierdzić, iż istnieje jedna bądź kilka najpopularniejszych ścieżek- można je jedynie (jak wcześniej) w pewien sposób pogrupować.
+
+Na tym skończymy naszą analizę ścieżek. Z dużą pewnością można stwierdzić, że najpopularniejsza trasa składałaby się następującyh eksponatów:
+
+-**cnk09 (Sztuka i emocje)**
+
+-**cnk12 (Sztuczny czy szczery)**
+
+-**cnk16 (Powąchaj mnie)**
+
+-**cnk20 (Zrób sobie tatuaż)**
+
+-**cnk21 (Młodzi fotografowie)** 
+
+-**cnk66 (Przesłyszałes się)** 
+
+a dalej najpewniej trzy eksponaty wspomniane przez nas wcześniej:
+
+
+-**cnk05 - Strojenie mózgu**
+
+-**cnk11 - Manipulator emocji**
+
+-**cnk17 - Otwartość na doświadczenie**
+
+<div id='5'/>
+#Podsumowanie
+
+Podsumowując- ciężko jest wybrać jednoznacznie najpopularniejsze ścieżki na podstawie danych. Z całą pewnością można je pogrupować ze względu na liczbę odwiedzin, jednak jest to analiza mało mówiąca- już przed otrzymaniem danych można było stwierdzić, że powinna występować zależność na eksponaty mniej i bardziej uczęszczane.
+Udało nam się jednak znaleźć najpopularniejsze trasy cztero- i mniej elementowe, a także z dużą pewnością stwierdzić jak będą wyglądać dłuższe popularne ścieżki.
+
+Należy także zauważyć, że wspomniany na samym początku tekstu eksponat **nr 19 - Sala Strachów**, tak jak przypuszczaliśmy nie znalazł się na najpopularniejszej ścieżce- mimo wszystko warto o nim pamiętać i według nas powinno się go na niej umieścić.
+
+
+Na poniższym rysunku zaznaczyliśmy przynależność stanowisk do najpopularniejszych ścieżek. Kolorem <span style="color:red">czerwonym</span> oznaczyliśmy przynależność do najpopularniejszej trzyelementowej ścieżki, kolorem <span style="color:green">zielonym</span> do czteroelementowej, kolorem <span style="color:blue">niebieskim</span> do pięcioelementowej, natomiast <span style="color:brown">brązowym</span> do sześcioelementowej
+
+
+![Najpopularniejsze sciezki](C:\\Users\\Rafał\\Desktop\\Projekt R\\Faza 2\\sciezki.png)
+
+
+Rysunek obrazujący najpopularniejsze ścieżki skłania do pewnych wniosków- jednym z nich jest zauważenie, że wszystkie eksponaty na nim zaznaczone znajdują się bardzo blisko wejścia do Re:generacji- może to wskazywać na fakt, iż ludzie wchodzący na wystawę chętniej zapoznają się z eksponatami, jednak z biegiem czasu rzadziej użytkują kolejne.

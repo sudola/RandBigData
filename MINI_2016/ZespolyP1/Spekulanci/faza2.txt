@@ -1,0 +1,53 @@
+
+Od strony kodu R to kilka rzeczy trzeba poprawić i rozbudować.
+Raport jest dopracowany, choć myślę że da się go poprawić - ułatwić jego czytanie.
+W kolejnym kroku warto zrobić i pakiet i zastanowić się nad aplikacją (aplikacja to opcja, ale pakiet - obowiązek).
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Słabo. To aktualnie najsłabsza strona tego raportu.
+
+Są funkcje, ale mało modułowe i duża część kodu jest niepotrzebnie kopiowana.
+Funkcja `grupy_stan()` to koszmar inżyniera oprogramowania.
+Jedna linijka jest skopiowana wiele razy i to już jest niedopuszczalne.
+Ale nawet ta linijka jest napisana nieoptymalnie, nie ma tu żadnych wyrażeń regularnych a są one 'wykrywane'.
+
+!! Nie ma kodów R do części 'Najpopularniejsze ścieżki'.
+Kody nie muszą być w tym punkcie, mogą być w załączniku, ale gdzieś muszą być.
+
+Funkcja `read.logs()` to jeden długi makaron. Można go podzielić na 4 funkcje, które byłyby znacznie czytelniejsze i łatwiejsze do analizy. Dlaczego 4? Praktycznie każda pętla może być wydzielona jako osobna funkcja.
+
+Mniejsze funkcje to czytelniejszy, elastyczny kod.
+
+A ponieważ wiemy jak tworzyć pakiety to lepiej byłoby cały ten kod/funkcje/dokumentacje umieścić w pakiecie.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Podejście jest ciekawe, ale powinni Panowie je dalej pociągnąć:
+* przy analizie trójek, nie ma co zatrzymywać się na pierwszych 3 trójkach, może kolejne są ciekawsze,
+* jeżeli dane świadczą przeciwko markowowości to trzeba to jakoś liczbowo uzasadnić,
+* w całym raporcie obok używania nazw cnk16 itp. warto w nawiasach podawać pełne nazwy eksponatów. Zrobić to można dosyć łatwo a będzie znacznie czytelniej.
+
+Nie jestem przekonany czy badanie najczęstszych czwórek i piątek ma sens. Dla trójek mogę zrozumieć zaletę z kolejności. Ale dla piątek już nie. Przecież piątki składają się z trójek.
+
+Oba wykresy z mapami bardzo mi się podobają. Choć ten drugi jest dosyć trudny do interpretacji.
+
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Moim zdaniem ten raport jest lepszy niż prezentacja na zajęciach.
+
+Wykresy są w czytelne i opisy też można zrozumieć.
+Jeżeli chodzi o treść to można ją przeczytać i zrozumieć.
+
+To czego brakuje to struktura.
+
+Warto:
+* dodać spis treści
+* dodać streszczenie z krótkim omówieniem jaki problem jest rozwiązywany i jakie jest rozwiązanie. Dopiero później można szczegółowo opisywać co zostało zrobione.
+
+Szczególnie to streszczenie może pomóc w zrozumieniu, co właściwie Panowie odkryli.
+

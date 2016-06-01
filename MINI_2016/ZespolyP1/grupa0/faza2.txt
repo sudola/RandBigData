@@ -1,0 +1,66 @@
+Pakiet jest bardzo przyzwoity.
+Ale nad aplikacją trzeba jeszcze popracować.
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Przyzwoicie, przyzwoicie, choć można kilka rzeczy poprawić.
+
+Zbudowanie pakietu to bardzo dobry pomysł.
+Funkcje i zbiory danych są przyzwoicie udokumentowane.
+Jest jakaś namiastka testów (szkoda że nic sensownego nie sprawdzają).
+
+Przy budowie pakietu tworzona jest dokumentacja w pdf. Umieszczenie jej na githubie obok samego pakietu byłoby dobrym pomysłem.
+
+Funkcja `typowa.pop` wyświetla wynik na ekranie. Zupełnie niepotrzebnie. Znacznie lepiej byłoby ten wynik zwrócić jako wartość.
+
+W funkcji `sciezka_mieisac` (dlaczego w nazwie jest literówka?) można by uniknąć trzykrotnego kopiowania wszystkich kodów. Wystarczyłoby zrobić mniejszą funkcję dla jednego pliku i ją trzy razy wywołać.
+
+W pliku `Faza2.html` część kodu jest w funkcjach część nie.
+Lepiej byłoby wszystko zamknąć w funkcjach.
+
+Pakiet był dobrym rozwiązaniem, ale skrypt `Faza2.html` robi gorsze wrażenie niż sam pakiet.
+
+Przy opisie danych raz jest rozszerzenie csv a raz rda. A przecież w katalogu są tylko pliki rda.
+
+Po co oszczędzać na długości nazw funkcji? W `wordcloud_urz` to 'urz' można by rozszerzyć.
+
+Aplikacja ma potencjał. Ale popracowałbym nad interfacem. Obecnie dosyć trudno się z niej korzysta i trudno odgadnąć co trzeba kliknąć. Każda zakładka w inny sposób pobiera argumenty.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+
+Trochę ta aplikacja wygląda jak burza mózgów. Jest sporo pomysłów, ale żaden nie jest dopracowany.
+Pomysłów jest też być może za dużo.
+
+Z tego wordcloud trudno coś odczytać. Jedne kolory, ale co z tej zakładki wynika?
+
+Instrukcja obsługi jest dobrym pomysłem, choć teraz trudno ją odnieść do samych wykresów i wyników.
+
+
+Wykresy ze ścieżkami i analiza długich ścieżek to ciekawy pomysł i warto go dalej eksplorować.
+Pokazywać nie tylko pojedyncze najdłuższe ścieżki ale kilka długich.
+Może da się zmienić kolejność eksponatów by coś znaczyła. 
+
+Rozkład czasów dla najdłuższej ścieżki to też bardzo ciekawy pomysł. Ale warto go dalej rozwinąć obecnie niewiele z niego wynika, bo może niektóre eksponaty wynikają mniejszego zaangażowania.
+Może trzeba jakoś te wyniki unormować?
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Chmura słów jest kolorowa ale nic z niej nie wynika.
+
+Użycie raporty i aplikacji to dobry pomysł. Przy czym raport mógłby mieć przyjemniejszy w czytaniu kod R.
+A aplikacja mogłaby mieć czytelniejszy interface.
+
+Najsłabszym punktem prezentacji wyników jest to, że trzeba wybierać daty. Trudno mi sobie wyobrazić by ktoś przejrzał kilkaset różnych dni. Trzeba te ścieżki pokazywać inaczej niż na bazie daty.
+Może kilka ścieżek - po jednej dla każdego dnia miesiąca?
+Trzeba poszukać jeszcze jakiegoś rozwiązania tutaj.
+
+
+Podsumowując, analiza długich ścieżek to dobry start, ale rozwiązanie jest póki co cząstkowe. 
+Warto rozwinąć i interface i analizy i sposób prezentacji wyników.
+
+
+
+
