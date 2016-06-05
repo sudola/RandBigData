@@ -46,16 +46,16 @@ Plan spotka&#324; MINI PW:
 * 7 III [GitHub](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_korzystac_z_serwisu_github_i_waffle.html), [Waffle](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_korzystac_z_serwisu_waffle.html), [dplyr](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/czyscic_przetwarzac.html)
 * 14 III [knitr](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_tworzyc_raporty.html), [praca z bazami danych](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_pracowac_z_bazami_danych.html), [zabawka](https://github.com/pbiecek/RandBigData/blob/master/MINI_2015/materialy/bazy_danych/zabawka.db)
 * 21 III [Shiny](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/jak_tworzyc_aplikajce.html), [ekstra link 1](http://bit.ly/1LAlBKE), [ekstra link 2](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/wynikiDF.rda), [ekstra link 3](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/wynikiDF.csv.zip)
-* 22 III [prezentacja projektu 1, faza 1, zamiast zajęć czwartkowych]
+* 22 III [prezentacja projektu 1, faza 1, zamiast zajęć czwartkowych](http://goo.gl/forms/kniIDj1GsI)
 * 4 IV [tworzenie pakietów z R](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pakiety/po_co.html)
 * 11 IV [profilowanie](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/profilowanie.html), prezentacja projektu 1, faza 2
 * 18 IV [debugowanie kodu](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/debugowanie.html), [zrównoleglanie obliczeń](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/rownolegle.html)
 
-* 25 IV [HPC + hydra], prezentacja projektu 1, faza 3 
-* 9 V [open CPU]
-* 16 V [wyjazdowo], prezentacja projektu 2, faza 1 
-* 23 V [spark]
-* 30 V [archivist], prezentacja projektu 2, faza 2
+* 25 IV [HPC + hydra](https://rawgit.com/pbiecek/RandBigData/master/MINI_2015/materialy/hpc/hpc.html), [prezentacja projektu 1, faza 3] 
+* 9 V [open CPU](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/REST.html)
+* 16 V [ankieta](http://goo.gl/forms/iWtckYi7Hc), prezentacja projektu 2, faza 1  `archivist::aread("pbiecek/Przewodnik/arepo/12b75717051be0ae516b900e1e70c049")`
+* 23 V [spark](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/Kornel.pdf)
+* 30 V [archivist](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/archivist.html), prezentacja projektu 2, faza 2
 * 6 VI [sparkR]
 * 13 VI [zobaczymy], prezentacja projektu 2, faza 3 
 

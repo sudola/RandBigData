@@ -1,0 +1,522 @@
+---
+title: "Projekt 2 Faza 1 - Analiza postów z Alior Banku"
+author: "Ewa Baranowska, Dorota £êpicka, Micha³ Stolarczyk, Micha³ M&uuml;ck"
+date: "13 maja 2016"
+output: html_document
+---
+
+```{r, echo = FALSE, message=FALSE}
+library(knitr)
+opts_chunk$set(echo = F, cache = F, warning = F, message = F, comment=NA, results='asis')
+library(RColorBrewer)
+library(stringi)
+library(archivist)
+library(dplyr)
+library(tm)
+setwd("D:\\Michal\\Matematyka\\MUF\\R i Big Data\\projekt2\\faza1")
+source("theMostFrequently.R")
+source("analiza_zdarzenia.R")
+source("wybor_zdarzen.R")
+source("usuwanie_stopwordsow.R", encoding = "UTF-8")
+source("ranking_slowa.R",encoding = "UTF-8")
+source("zamiana_czasownikow.R",encoding = "UTF-8")
+source("wordcloud_plot.R",encoding = "UTF-8")
+source("watki.R")
+```
+
+## Przygotowanie danych
+
+Nasze dane dotyczy³y postów ze strony fanpage'a AliorBanku na facebooku. Przed przyst¹pieniem do analiz przepuœciliœmy teksty postów przez korektê jêzykow¹, po czym wybraliœmy z nich s³owa zakwalifikowane jako rzeczowniki i wziêliœmy ich formê podstawow¹. Otrzymany wynik nie do koñca nas satysfakcjonowa³ dlatego usunêliœmy z otrzymanych rzeczowników tzw. stopwordsy, a rzeczowniki odczasownikowe, których form¹ podstawow¹ jest czasownik i jako czasownik by³y zwracane przez aplikacjê, zamieniliœmy z powrotem na rzeczowniki. Wy³uskane w ten sposób rzeczowniki zapisawaliœmy w formie wyraz1|wyraz2|... do nowej kolumny. W wyniku tych dzia³añ otrzymaliœmy zbiór danych danych postaci:
+
+```{r,warning=F, message=F}
+dane <- read.csv("dane_ost.csv", header = T, stringsAsFactors = F,
+                 encoding = "UTF-8")
+
+dane$rzeczowniki <- usuwanie_stopwordsow(dane$rzeczowniki)
+dane$rzeczowniki <- zamiana_czasownikow(dane$rzeczowniki)
+
+```
+
+
+```{r}
+kable(dane[2:3,-c(1)])
+```
+
+# PUNKT WIDZENIA - RZECZOWNIKI
+
+## Statystyki dla rzeczowników
+
+Spójrzmy na podstawowe statystyki dotycz¹ce rzeczowników w badanych tekstach.  W naszych danych uda³o nam siê wyodrêbniæ ³¹cznie **114 497** rzeczowników, w tym **10 825** ró¿nych (co stanowi **9.5%** ca³ej liczby). Patrz¹c na rozk³ad iloœci wyst¹pieñ rzeczowników, widzimy bardzo mocn¹ prawostronn¹ skoœnoœæ (górny kwantyl poni¿ej 5, przy maksimum równym **2609**). Wynika ona z faktu, ¿e w zbiorze znajduje siê bardzo du¿o rzeczowników, które pojawi³y siê tylko jednokrotnie.
+
+```{r,message=F, warning=F}
+rzeczowniki_lista <- strsplit(unlist(dane$rzeczowniki), split = "|", fixed = T)
+rzeczowniki <- unlist(rzeczowniki_lista)
+rzeczowniki <- rzeczowniki[rzeczowniki != ""]
+
+ilosc_rzeczownikow <- length(rzeczowniki)
+rzeczowniki_unique <- unique(rzeczowniki)
+ilosc_rzeczownikow_unik <- length(rzeczowniki_unique)
+
+#ilosc_rzeczownikow_unik/ilosc_rzeczownikow*100
+
+n <- nrow(dane)
+
+srednio <- ilosc_rzeczownikow/n
+
+korpus <- Corpus(VectorSource(rzeczowniki_lista))
+korpus <- DocumentTermMatrix(korpus, control = list(wordLengths = c(1,Inf))) 
+korpus_mac <- as.matrix(korpus)
+
+# ze wzglêdu na posty podzial
+ile_rzecz_w_dok <- rowSums(korpus_mac)
+ile_rzecz_w_dok <- sort(ile_rzecz_w_dok, decreasing=TRUE)
+
+# ze wzglêdu na rzeczowniki podzia³
+rank <- colSums(korpus_mac)
+rank <- sort(rank, decreasing=TRUE)
+
+
+# ile unikalnych rzeczowników w postach
+ile_unik <- lapply(rzeczowniki_lista, function(x){
+   length(unique(x))
+})
+
+ile_unik <- unlist(ile_unik)
+#ile_unik[1:10]
+#ile_rzecz_w_dok[1:10]
+
+
+ile_unik_ktore <- rzeczowniki[ile_unik != ile_rzecz_w_dok]
+
+```
+
+
+
+```{r}
+library(ggplot2)
+library(ggthemes)
+addHooksToPrint(class=c("ggplot", "knitr_kable", "data.frame"),
+                 repoDir = "raportrepo", 
+                 repo = "PracaDomowaRepo", user = "michalmini", subdir = "raportrepo")
+
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL, titlesize = 12, title="") {
+   library(grid)
+   
+   # Make a list from the ... arguments and plotlist
+   plots <- c(list(...), plotlist)
+   
+   numPlots = length(plots)
+   
+   # If layout is NULL, then use 'cols' to determine layout
+   if (is.null(layout)) {
+      # Make the panel
+      # ncol: Number of columns of plots
+      # nrow: Number of rows needed, calculated from # of cols
+      layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                       ncol = cols, nrow = ceiling(numPlots/cols))
+   }
+   
+   if (numPlots==1) {
+      print(plots[[1]])
+      
+   } else {
+      # Set up the page
+      grid.newpage()
+      pushViewport(viewport(layout = grid.layout(nrow(layout)+1, ncol(layout), heights = unit(c(0.7, 4), "null"))))
+      grid.text(title, 
+                vp = viewport(layout.pos.row = 1, layout.pos.col = 1:2),
+                gp = gpar(fontsize = titlesize))
+      # Make each plot, in the correct location
+      for (i in 1:numPlots) {
+         # Get the i,j matrix positions of the regions that contain this subplot
+         matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+         print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row+1,
+                                         layout.pos.col = matchidx$col))
+      }
+   }
+}
+
+
+rysujRozklady <- function(wektor, tytulgl="", tytulboxp="", tytulhist="", max_hist_x, krok=10){
+   
+   require(ggplot2)
+   
+   staty <- summary(wektor)
+   
+   DF <- data.frame(x=factor(c(""),
+                                  levels= c("")), 
+                         min=staty[1], low=staty[2], mid=staty[3], top=staty[5], 
+                         max=staty[6])
+   
+   p_d <- ggplot(DF, aes(x=x, ymin = min, lower = low, middle = mid, upper = top, ymax = max)) +
+      geom_boxplot(stat = "identity", colour="#556270",fill="#4ECDC4") + ggtitle(tytulboxp) +
+      xlab("") + ylab("Iloœæ rzeczowników")+ coord_cartesian(ylim = c(0, staty[5] + 10)) +
+      theme(axis.ticks=element_blank(), axis.text=element_text(size=12), axis.title = element_text(size=14))
+     
+   y_r <- ggplot_build(p_d)$panel$ranges[[1]]$y.minor_source
+   y_r <- y_r[length(y_r)]
+   x_r <- ggplot_build(p_d)$panel$ranges[[1]]$x.major_source
+   x_r <- x_r[length(x_r)]
+ 
+  p_d <- p_d +  annotate("text", label = paste0("I kwartyl: ", staty[2]), x = 0.7*x_r, y =y_r, size = 4, colour = "black")+
+      annotate("text", label = paste0("III kwartyl: ", staty[5]), x = 0.7*x_r, y =0.9*y_r, size = 4, colour = "black")
+ 
+   
+   DF <- as.data.frame(wektor)
+   
+ p_d1 <- ggplot(data=DF, aes(DF$wektor)) + 
+  geom_histogram(breaks=seq(0, staty[6], by = krok), 
+                 col="#DB0A5B", 
+                 fill="#EBC2C2") + 
+  labs(title=tytulhist)+
+      theme(axis.ticks=element_blank(), axis.text=element_text(size=12), axis.title = element_text(size=14))+
+    xlab("") +  ylab("Licznoœæ") + coord_cartesian(xlim = c(0, max_hist_x))
+ 
+ y_r <- ggplot_build(p_d1)$panel$ranges[[1]]$y.minor_source
+ y_r <- y_r[length(y_r)]
+ 
+ p_d1 <- p_d1 +  annotate("text", label = paste0("max: ", staty[6]), x = 0.7*max_hist_x, y =y_r, size = 4, colour = "black")+
+      annotate("text", label = paste0("mediana: ", staty[3]), x = 0.7*max_hist_x, y =0.9*y_r, size = 4, colour = "black")+
+      annotate("text", label = paste0("œrednia: ", staty[4]), x = 0.7*max_hist_x, y =0.8*y_r , size = 4, colour = "black")
+ 
+ multiplot(p_d1,p_d, cols=2, title=tytulgl)
+}
+
+rr<-rysujRozklady(rank, tytulgl = "Rozk³ad iloœci wyst¹pieñ rzeczowników" ,max_hist_x = 100)
+rr
+```
+
+Spójrzmy na tabelê rozk³adu iloœci wyst¹pieñ. Widaæ z niej, ¿e ponad po³owa rzeczowników wyst¹pi³a zaledwie raz. 
+```{r}
+labelki <- c("1 raz", "2-5", "6-10", "11-50", "51-100", "101-1000", "1001-2609" )
+licznosci <- cut(rank ,breaks =c(0,1,5,10,50,100,1000,max(rank)+1), 
+                 labels = labelki )
+df <- t(as.data.frame(labelki))
+colnames(df) <- labelki
+rownames(df) <- NULL
+df[1,] <- as.character(table(licznosci))
+df <- rbind(df, paste0(as.character(round(table(licznosci)/length(rank)*100,2)),"%"))
+kable(df)
+```
+
+Jako, ¿e najprawdopodobniej wiêkszoœæ z tych pojedynczych rzeczowników nie bêdzie mia³a wiêkszego znaczenia w analizach (literówki, przypadkowe u¿ycie etc.), przedstawmy rozk³ad iloœci wyst¹pieñ rzeczowników, ale bez tych pojedynczych wyst¹pieñ. Widaæ teraz, ¿e górny kwantyl wzrós³ o ponad po³owê i wynosi teraz 11,a mediana 4. Zatem jeœli dane s³owo siê powtarza³o przynajmniej raz, to  po³owa takich s³ów mia³a liczbê wyst¹pieñ wiêksz¹ lub równ¹ 4.
+
+```{r}
+rysujRozklady(rank[rank != 1], tytulgl = "Rozk³ad iloœci wyst¹pieñ rzeczowników (bez pojedynczych)", max_hist_x = 100 )
+```
+
+## Najpopularniejsze s³owa
+
+Zobaczmy graficznie jak przedstawiaj¹ siê najpopularniejsze s³owa. Widaæ, ¿e wiêkszoœæ s³ów jest zwi¹zana z bran¿¹ bankow¹, tj. klient, konto, rachunek czy przelew. Warto zwróciæ uwagê, ¿e wœród tych najczêstszych s³ów znajduj¹ siê dwa imiona - Magda i Kuba. Wynika to z faktu, ¿e na posty u¿ytkowników w imieniu banku odpowiada³y osoby o tych imionach, które zawsze pod koniec posta umieszcza³y swoje imiê. 
+
+```{r, warning=F,message=F}
+ranking <- ranking_slowa(dane$rzeczowniki)
+ranking <- ranking[ranking$word != "",]
+#ranking1$word <- stri_replace_all_fixed(ranking1$word, pattern = "_", replacement = " ")
+wordcloud_plot(slowa = ranking$word, licznosci = ranking$count, ile_slow = 50, kolory_wg_liczn = F, od_srodka = F,
+               tytul = "Wordcloud dla 50 najczêstszych s³ów")
+
+```
+
+Przedstawmy ranking 10 najpopularniejszych s³ów wraz z ich statystykami. Jak widaæ najczêstszym s³owem jest oczywiœcie **bank** z liczb¹ wyst¹pieñ równ¹ **2609**. To s³owo wystêpowa³o w **17%** postów. Kolejnym s³owem jest wspomniana Magda (**15%** postów), konto, klient, itd.
+```{r, warning=F,message=F}
+#unikalne rzeczowniki dla ka¿dego postu
+jakie_unik <- lapply(rzeczowniki_lista, function(x){
+   u <- unique(x)[unique(x)!=""]
+})
+
+#ranking wg liczby unikalnych slowo
+slowa_w_ilu_dok <- sort(table(unlist(jakie_unik)),  decreasing = T)
+slowa_w_ilu_dok_proc <- slowa_w_ilu_dok/length(dane$rzeczowniki)*100
+tab <- data.frame(word = names(slowa_w_ilu_dok_proc), procent_dok = slowa_w_ilu_dok_proc, rank_dok = 1:length(slowa_w_ilu_dok))
+colnames(tab)[colnames(tab) == "procent_dok"] <- "procent per post"
+colnames(tab)[colnames(tab) == "rank_dok"] <- "rank per post"
+tabelka <- merge(ranking,tab, by = "word")
+tabelka$rank <- as.numeric(tabelka$rank)
+tabelka <- tabelka[order(tabelka$rank),]
+tabelka$procent <- round(tabelka$procent,2)
+tabelka$`procent per post` <- round(tabelka$`procent per post`,2)
+rownames(tabelka) <- NULL
+kable(head(tabelka[,c(1,3,6,2,4,5)],10))
+
+```
+
+W tabeli umieœciliœmy 2 liczby procentowe i 2 rankingi. Pierwszy ranking i procenty odnosz¹ siê do ³¹cznej liczby wyst¹pieñ, natomiast drugie do ³¹cznej liczby dokumentów. Jak widaæ te rankingi pokrywaj¹ siê dla tych 10 najpopularniejszych s³ów. W wiêkszoœci przypadków rankingi te pokrywaj¹ siê lub ró¿ni¹ o zaledwie parê pozycji. S³owa, dla których te rankingi ró¿ni¹ siê o wiêcej niz 5 wylistowaliœmy poni¿ej. Jest ich 14 i s¹ to tylko rzeczowniki odczasownikowe. Wystêpowa³y one czêœciej per post ni¿ w ³¹cznej sumie rzeczowników. Zwróæmy uwagê, ¿e dla ka¿dego z tych s³ów ranga w rankingu wg wystêpowania jest wy¿sza (jest wy¿ej w rankingu) ni¿ ranga z rankingu per post. Zatem jeœli te s³owo wyst¹pi³o to raczej w jednym poœcie kilkukrotnie ni¿ pojedynczo w wielu postach. 
+
+```{r}
+tabeleczka <- tabelka
+tabeleczka$rozn <- abs(tabelka$rank - tabelka$`rank per post`)
+ktore <- tabeleczka$rozn > 5
+tabeleczka1 <- tabeleczka[ktore,]
+tabeleczka1 <- tabeleczka1[order(tabeleczka1$rozn, decreasing = T),]
+rownames(tabeleczka1) <- NULL
+kable(tabeleczka1[,c(1,3,6,2,4,5,7)])
+```
+
+Zobaczmy przyk³adowy post dla s³owa "anulowanie":
+
+**--------------------------------------------------------------**
+
+```{r}
+cooo <- stri_detect_fixed(dane$rzeczowniki, pattern = "anulowanie")
+dane111 <- dane[cooo,]
+df <-data.frame(cos =dane[10973,"body"])
+#kable(df, col.names = "")
+```
+
+
+"Skontaktowa³am siê z Wasz¹ infolini¹, i co? I nic. Nadal wniosek wisi w powietrzu, nie ma go komu anulowaæ, mija ju¿ 5 dzieñ a ja chcia³am za³o¿yæ w Waszym banku konto firmowe, chyba pope³ni³abym najwiêkszy b³¹d w ¿yciu bo jak mia³aby  dzia³aæ tak samo obs³uga mojego konta jak **anulowanie** wniosku, to ja bardzo podziêkuje. Dziêki temu, ¿e wniosek nadal jest aktywny wstrzymaliœcie mi mo¿liwoœæ zaci¹gniêcie np. po¿yczki w innym banku. Jest to nie dopuszczalne, od 5 dni czekam na **anulowanie** wniosku, Wasz \"bank\" jest po prostu z³y!  Jak mo¿na tyle czekaæ na **anulowanie**? **Anulowanie** w³asnego wniosku, Wam jak raty nie zap³acê w terminie to ma³o g³owy cz³owiekowi nie urwiecie! Straszycie, szanta¿ujecie etc. Doœæ tego, mam prawo napisaæ na Was skargê. I zrobiê to."
+
+
+**-------------------------------------------------------------**
+
+Czyli rzeczywiœcie dane potwierdzaj¹ powy¿szy wniosek. W przytoczonym przyk³adzie klient chce anulowaæ wniosek i aby opisaæ swoj¹ proœbê/problem wprost kilkukrotnie u¿ywa s³owa "anulowanie".
+
+## Statystyki dla postów
+
+Przyjrzyjmy siê teraz rozk³adowi rzeczowników w postach. W zbiorze danych mamy **15 594** posty, a na post przypada œrednio **7.34** rzeczownika. Ten rozk³ad jak mo¿na by³o siê spodziewaæ jest równie¿ prawostronnie skoœny, mamy du¿o postów z ma³¹ iloœci¹ rzeczowników
+
+```{r}
+rysujRozklady(ile_rzecz_w_dok, tytulgl = "Rozk³ad iloœci rzeczowników w postach", max_hist_x = 100)
+```
+
+Maksymalna iloœæ rzeczowników w jednym poœcie wynosi³a **156**. Post o najwiêkszej iloœci rzeczowników dotyczy³ opisu sytuacji, która mia³a miejsce w banku, wiêc du¿a iloœæ rzeczowników wynika³a po pierwsze z charakteru postu jako opisu, a po drugie z jego znacznej d³ugoœci.
+
+## Rozk³ad wybranych s³ów w czasie
+
+Spójrzmy na rozk³ad wybranych popularnych s³ów w czasie. Nasze dane pochodz¹ z okresu od **20 czerwca 2013** roku do **28 lutego 2016** roku, czyli mamy dane z **984** dni. W celu wykrycia nietypowych sytuacji przeanalizowaliœmy wykresy iloœci wyst¹pieñ charakterystycznych s³ów w czasie liczonym w tygodniach. Jako nietypow¹ liczbê wyst¹pieñ danego s³owa potraktowaliœmy liczbê wiêksz¹ od 3 odchyleñ standardowych dla wyst¹pieñ danego s³owa. Z tych nietypowych liczb wybieraliœmy t¹ maksymaln¹ i dla niej przegl¹daliœmy posty z danego tygodnia w celu sprawdzenia powodu tak nag³ego wzrostu wystapieñ wybranego s³owa. 
+
+Zanalizowaliœmy wykres dla s³owa "problem" i "awaria". Z wykresu dla "problemu" widaæ wyraŸmy pik w okolicach pocz¹tku 2014. 
+
+```{r}
+# inne slowo
+wykres_ts <- function(slowo, data = dane, korpus=korpus_mac){
+   require(xts)
+   czasy <- data$created_at
+   czasy <- as.POSIXct(czasy)
+   ile <- table(czasy)
+   wystapienia1<- korpus[,slowo]
+   razem <- data.frame( czas = czasy, wystapienia = wystapienia1)
+   razem.xts <- xts(razem$wystapienia,as.POSIXct(razem$czas))
+   ends <- endpoints(razem.xts,on='weeks') 
+   skumulowane <- period.apply(razem.xts,ends,sum)
+   plot.xts(skumulowane, main = paste0("Wyst¹pienia s³owa ",slowo," w czasie (per week)"), auto.grid = F, type="l")
+   lines(skumulowane, col = "blue")
+   which <- as.numeric(skumulowane) > sqrt(var(as.numeric(skumulowane)))*3 #IQR(skumulowane)*1.34  
+   daty <- skumulowane[which]
+   tydzien <- format(x=as.Date(as.character(index(daty))), format="%W"  )
+   rok <- format(x=as.Date(as.character(index(daty))), format="%Y"  )
+   kiedy <- lapply(as.list(1:length(rok)), function(i){
+      
+      czas <- format(czasy[format(czasy, "%W") == tydzien[i] & format(czasy, "%Y") == rok[i]], "%Y-%m-%d %H:%M:%S")
+      
+   })
+   
+   kiedy <- kiedy[order(as.numeric(daty), decreasing = T)] # zwraca w kolejnosci malejacej
+}
+
+
+daty1 <- wykres_ts("problem")
+
+```
+
+Przyjrzyjmy siê typowemu postowi z tygodnia, który odpowiada³ temu pikowi. Jak widaæ problem doryczy³ logowania siê online na stronie internetowej banku.
+```{r}
+co <- dane[dane$created_at %in% daty1[[1]],]
+co <- co[stri_detect_fixed(co$rzeczowniki, pattern = "problem"), c("created_at","body")]
+co$body <-stri_replace_all_regex(co$body, pattern = "\\\n", replacement = " ")
+co$body <-stri_replace_all_fixed(co$body, pattern = "\"", replacement = " ")
+kable(co[1,], row.names = F)
+
+
+```
+
+Podobnie zrobiliœmy dla s³owa "awaria". WyraŸny skok by³ widoczny ko³o czerwca 2015. Z typowego postu dla tego tygodnia wynika, ¿e awaria dotyczy³a bankomatów.
+
+```{r}
+daty1 <- wykres_ts("awaria")
+co <- dane[dane$created_at %in% daty1[[1]],]
+co <- co[stri_detect_fixed(co$rzeczowniki, pattern = "awaria"), c("created_at","body")]
+co$body <-stri_replace_all_regex(co$body, pattern = "\\\n", replacement = " ")
+co$body <-stri_replace_all_fixed(co$body, pattern = "\"", replacement = " ")
+kable(co[15,], row.names = F)
+```
+
+# PUNKT WIDZENIA - GRUPY NADAWCÓW
+
+W tym punkcie dokonuj¹c analizy rzeczowników w komentarzach Alior Banku zosta³y dodatkowo usuniête imiona i nazwiska (b¹dŸ  wymyœlone nazwy) adresatów postów. 
+Aktywny udzia³ (wiêcej ni¿ 1 komentarz) bra³o 4645 ró¿nych u¿ytkowników. Przedstawimy teraz kilka podstawowych statystyk dotycz¹cych pracowników banku oraz 3 najaktywniejszych osób: £ukasza Majewskiego, Tomasza Zió³kowskiego i Paw³a Krawca.
+
+| U¿ytkownik        | Liczba postów | Ró¿nych rzeczowników | Suma rzeczowników | Najwiêksza aktywnoœæ |
+|-------------------|---------------|----------------------|-------------------|----------------------|
+| Alior Bank SA     | 5032          | 3788                 | 37397             | 2014-05-05           |
+| £ukasz Majewski   | 278           | 612                  | 2170              | 2013-10-22           |
+| Tomasz Zió³kowski | 111           | 287                  | 546               | 2014-04-02           |
+| Pawe³ Krawiec     | 89            | 241                  | 390               | 2014-07-08           |
+
+Na poni¿szym wykresie przedstawiliœmy rozk³ad sumy rzeczowników z podzia³em na lata u trzech najaktywniejszych u¿ytkowników.
+
+<img src="rok.png" alt="Drawing" style="width: 700px;"/>
+
+Mo¿emy zaobserwowaæ, ¿e u wszystkich u¿ytkowników najwiêcej rzeczowników by³o w komentarzy w 2014 roku. Widaæ równie¿ skrajne ró¿nice w sumie rzeczowników miêdzy nadawcami, ale procentowy udzia³  w 2014 Majewski - 63%, Zió³kowski - 64%, Krawiec - 54% jest podobny. Wszyscy panowie nie pisali ju¿ komentarzy w 2016 roku. 
+
+Przyjrzyjmy siê teraz jakie rzeczowniki powtarza³y siê najczêœciej w komentarzach u¿ytkowników i Alior Banku. 
+
+<img src="nazwisko.png" alt="Drawing" style="width: 700px;"/>
+
+Jak widaæ panowie £ukasz i Tomasz u¿ywali podobnych rzeczowników, natomiast Pawe³ nieco odbiega od nich. W postach p.Krawca na czo³owych miejscach znajdowa³y siê równie¿ s³owa: oddzia³, klient i farsa, których nie by³o w pierwszej 10 u pozosta³ych osób.
+
+<img src="alior.png" alt="Drawing" style="width: 700px;"/>
+
+Mo¿emy równie¿ zauwa¿yæ, ¿e 7/10 najpopularniejszych rzeczowników w postach Alior Banku pokrywaj¹ siê z ogólnymi statystykami.
+
+# W¹tki
+
+```{r, echo = FALSE, message=FALSE}
+options(stringsAsFactors = FALSE)
+dane <- read.csv("dane_ost.csv")
+```
+
+
+W zbiorze danych znajduj¹ siê **15594** posty zgrupowane w **3276** w¹tkach. Œrednia liczba postów w w¹tku wynosi **4.76**, natomiast mediana jest równa **3**.
+
+```{r, echo = FALSE, message=FALSE, fig.align='center'}
+
+data.frame(x = table(dane$thread_id)) %>%
+    ggplot(aes(x=x.Freq)) +
+    geom_histogram() +
+    xlab("Liczba postów w w¹tku") +
+    ylab("Licznoœæ") +
+    ggtitle("Rozk³ad liczby postów w w¹tkach")
+```
+
+Posty w jednym w¹tku powinny mieæ zbli¿ony temat, dlatego w dalszej analizie w¹tki bêdziemy traktowaæ jak jeden tekst. 
+Aby znaleŸæ problemy jakie napotykaj¹ klienci, szukaliœmy s³ów kluczowych: **awaria, problem, uwaga**. W¹tki z du¿¹ liczb¹ takich s³ów bêd¹ prawdopodobnie zawiera³y uwagi dotycz¹ce us³ug banku. Poni¿szy wykres przedstawia zale¿noœæ liczby takich s³ów w w¹tkach od czasu. 
+
+```{r, results="asis", echo = FALSE}
+wykres <- wykres_watki_keywords(dane, c("awaria", "problem", "uwaga"))
+print(wykres, "chart")
+```
+
+
+Dodatkowo po najechaniu na punkt, jest wyœwietlane id w¹tku oraz 5 najbardziej *charakterystycznych* s³ów. *Charakterystycznoœæ* s³owa dla w¹tku mierzyliœmy za pomoc¹ wag **tfidf**. Waga **tfidf** dla s³owa $i$ w tekœcie $j$ jest zdefiniowana jako
+\[  \mathrm{tfidf}_{ij}  = \mathrm{tf}_{ij} \cdot  \mathrm{idf}_{i},  \]
+gdzie $\mathrm{tf}_{ij}$ jest czêstoœci¹ wystêpowania s³owa $i$ w tekœcie $j$, natomiast
+$\mathrm{idf}_{i}$ jest logarytmem ilorazu liczby tekstów przez liczbê dokumentów, w których wystêpuje $i$-te s³owo. 
+
+Gdy s³owo wystêpuje w wiêkszoœci tekstów, idf bêdzie ma³e, dziêki czemu waga dla tego s³owa te¿ bêdzie ma³a. Natomiast gdy s³owo wystêpuje w niewielu tekstach, to idf bêdzie du¿e, przez co waga $\mathrm{tfidf}$ równie¿ bêdzie ros³a.
+
+Poni¿ej przedstawiamy dwa w¹tki z najwiêksz¹ liczb¹ s³ów kluczowych.
+
+```{r, results="asis", echo = FALSE}
+watek1 <- stri_replace_all_fixed(dane[dane$thread_id == 221343, "body"], "\n", " ")
+cat("#### id = 221343 \n \n")
+cat(paste0("* ", watek1, collapse = "\n"))
+cat("\n \n \n")
+watek2 <- stri_replace_all_fixed(dane[dane$thread_id == 1200716, "body"], "\n", " ")
+cat("#### id = 1200716 \n \n")
+cat(paste0("* ", watek2, collapse = "\n"))
+```
+
+# Analiza zdarzeñ
+
+```{r}
+dane <- read.csv("dane_rzecz.csv", header = TRUE)
+dane=dane%>%filter(!rzeczownik %in% c("magda", "kuba","justyna", "julian", "mariusz", "alior", "bank","alior_bank"))
+dni=7 #wielkoœæ okresów z kórych bierzemy najczêœciej wystêpuj¹ce s³owo (w dniach)
+```
+
+Aby znaleŸæ nietypowe zdarzenia, które mia³y miejsce w czasie, z którego posiadamy dane, przeanalizowaliœmy najczêœciej wystêpuj¹ce s³owa na przestrzeni tygodnia. Analiza odby³a siê metod¹ ruchomego okna. Aby s³owa czêsto powtarzaj¹ce siê w konwersacji nie zas³oni³y jej treœci, z analizowanych s³ów zosta³y usuniête **imona pracowników banku** odpowiadaj¹cych na maile oraz s³owa: **bank**, **alior**,**alior_bank**. Poni¿ej zosta³ przedstawiony wykres njczêœciej wystêpuj¹cych s³ów w poszczególnych okresach.
+
+```{r, echo = FALSE, message=FALSE, fig.align='center'}
+mostf=theMostFrequently(dni, dane)
+colourCount = length(unique(mostf$rzecz))
+getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+ww<-mostf %>%
+  filter(ile>=10) %>%
+  ggplot(aes(x = date, y = ile, fill = rzecz)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = getPalette(colourCount)) +
+  theme(legend.position="bottom") +
+  xlab("Data") +
+  ylab("Liczba postów z tym s³owem") +
+  ggtitle("Maksymalne licznoœci s³ów w danym przedziale czasu")
+saveToLocalRepo(ww)
+aread("7438450c5941553cca1263daa362e973")
+```
+
+Nastêpnie odfiltrowaliœmy dane dla tych s³ów, które maj¹ udzia³ w najczêœciej pojawiaj¹cych siê s³owach nie wiêkszy ni¿ 2%. Podejrzewamy, ¿e dla tych s³ów podczas tych wyst¹pieñ w postach kiedy pojawia³y siê czêœciej ni¿ inne zachoadzi³y ciekawe i niecodzienne wydarzenia. Oto wykres tylko dla wyselekcjonowanych s³ów.
+
+```{r, results="asis", echo = FALSE, fig.align='center'}
+mostf=mostf %>%
+  filter(ile>=10) %>%
+  wybor_zdarzen(0.02)
+colourCount = length(unique(mostf$rzecz))
+mostf %>%
+  ggplot(aes(x = date, y = ile, fill = rzecz)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = getPalette(colourCount)) +
+  theme(legend.position="bottom") +
+  xlab("Liczba postów z tym s³owem") +
+  ylab("Data") +
+  ggtitle("Maksymalne licznoœci s³ów - zdarzenia")
+```
+
+Dla trzech wybranych s³ów: **film**, **aplikacja** i **emil**, zosta³y przedstawione posty z dzatami wyst¹pienia oraz w przewidywanym podziale na zdarzenia
+
+```{r, results="asis", echo = FALSE}
+zd1 <- analiza_zdarzenia("film", dane, mostf, dni)
+n=0
+cat("##", "film", "\n \n")
+for (i in zd1){
+  n=n+1
+  cat("\n###", "Zdarzenie ", n, "\n \n")
+  m=0
+  for(j in i){
+    m=m+1
+    cat("\n####", "Data: ", names(i)[m], "\n \n")
+    j <- stri_replace_all_fixed(j, "#", "")
+    j <- stri_replace_all_fixed(j, "\n", " ")
+    for(k in j){
+      cat("* ", k, "\n")
+    }
+  }
+}
+
+zd2 <- analiza_zdarzenia("aplikacja", dane, mostf, dni)
+n=0
+cat("\n##", "aplikacja", "\n \n")
+for (i in zd2){
+  n=n+1
+  cat("\n###", "Zdarzenie ", n, "\n \n")
+  m=0
+  for(j in i){
+    m=m+1
+    cat("\n####", "Data: ", names(i)[m], "\n \n")
+    j <- stri_replace_all_fixed(j, "#", "")
+    j <- stri_replace_all_fixed(j, "\n", " ")
+    for(k in j){
+      cat("* ", k, "\n")
+    }
+  }
+}
+
+zd3 <- analiza_zdarzenia("emil", dane, mostf, dni)
+n=0
+cat("\n##", "emil", "\n \n")
+for (i in zd3){
+  n=n+1
+  cat("\n###", "Zdarzenie ", n, "\n \n")
+  m=0
+  for(j in i){
+    m=m+1
+    cat("\n####", "Data: ", names(i)[m], "\n \n")
+    j <- stri_replace_all_fixed(j, "#", "")
+    j <- stri_replace_all_fixed(j, "\n", " ")
+    for(k in j){
+      cat("* ", k, "\n")
+    }
+  }
+}
+```

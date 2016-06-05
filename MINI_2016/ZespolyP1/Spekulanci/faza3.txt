@@ -1,0 +1,58 @@
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Jest pakiet DataProcess ale nie jest on wykorzystywany ani w aplikacji ani w raporcie.
+
+Pakiet jest przyzwoicie napisany i udokumentowany.
+Brakuje w nim jednak testów dla funkcji z pakietu.
+Plik DESCRIPTION nie jest uzupełniony.
+
+Zrobili panowie też aplikację.
+Nie ma w niej jednak opisów,
+wersja na GitHub nie działa, mam błąd "invalid multibyte string at '<9c>roda'"
+wersja na www nie wyświetla na pierwszej stronie wykresu.
+
+Zamiast robić wszystko po trochu (pakiet, raport, aplikacja) lepiej byłoby jedną z nich bardziej dopracować.
+
+Aplikacja wygląda jak niedopracowana kopia aplikacji innych grup.
+
+Aplikacja zamiast odczytywać dane z plików lub z pakietu na początku łączy się z SQLitową bazą danych.
+Tworzy to zbędny narzut, dodaje dodatkowe zależności. Generalnie to złe rozwiązanie.
+Najlepiej umieścić te dane w pakiecie.
+
+Raport jest najsilniejsza stroną, ale kod R w raporcie jest bardzo bałaganiarski.
+Czasem używane jest = a czasem <-.
+Budowanie macierzy przejść, która jest w pakiecie, powinno być zamknięte w pakiecie jako osobna funkcja.
+
+Ścieżki do plików nie powinny być bezwzględne ale względne.
+Zamiast wklejać same pliki png, powinien być też kod R, który te wykresy tworzy.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Pomysł z badaniem markowoskości jest ciekawy.
+Weryfikacja założeń, przyjętych przez inne zespoły to dobry pomysł.
+Wadą tego podejścia jest jedynie nieadekwatność w przypadku tak dużej liczby danych. Test chi2 ma moc praktycznie =1.
+
+Metody analizy są też dosyć zaawansowane, więc to jest najsilniejsza część tego projektu.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Bardzo barokowe są te opisy. Np. poniższe dwa zdania.
+,, Prostą konkluzją jest więc stwierdzenie, że wysnuwanie wniosków o najczęściej uczęszczanych ścieżkach za pomocą jednokrokowej macierzy przejścia jest błędem. Zatem fakt stwierdzony testami zostaje również potwierdzony empirycznie.''
+
+Aplikacja jest bardzo nieczytelna. 
+Trudno odgadnąć co się dzieje przy przełączeniu radioboxa Duża / mała.
+Opis 'Na mapkę naniesione zostały najbardziej lub najmniej popularne ścieżki dla wybranego eksponatu.' można było zmienić.
+
+
+
+
+Punktacja: 
+
+Ad 1: 60%
+Ad 2: 90%
+Ad 3: 80%
+
+
