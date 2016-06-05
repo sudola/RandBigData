@@ -1,0 +1,51 @@
+Jest potencjał, ale trzba go dopracować. Teraz wiele elementów wygląda jakby były robione na ostatnią chwilę i nie zostały dopracowane bo brakło czasu.
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+
+Wykonanie pakietu to dobry pomysł, choć sam pakiet jest słabo dopracowany.
+
+Udokumentowane są funkcje, które nie są eksportowane (eksportowana jest tylko jedna).
+
+W pliku 'pstwa_przejscia' spodziewałabym się że używane są funkcje z pakietu (skoro już ten pakiet istnieje).
+
+Opis aplikacji w pliku 'pstwa_przejscia' jest bardzo skromny. A przecież można by tu umieścić przynajmniej screenshoty.
+
+
+Wszystko (i pakiet, i opis i aplikacja) sprawia wrażenie jedynie rozpoczętych, robionych w pośpiechu.
+
+Żaden z tych elementów nie jest dopracowany.
+
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+
+Niestety trudno ocenić, ponieważ w aplikacji (gdzie jest najwięcej wyników) opis jest na tyle skąpy, że nie wiem co właściwie jest przedstawione i co z tego wynika. 
+
+Ten suwak 'Wybierz liczbę eksponatów' nic nie wnosi.
+
+Zakładka 'Eksponaty' mogłaby być świetna, gdyby dało się odgadnąć, że można kliknąć w eksponat. 
+Podobnie teraz, bez legendy nie sposób odczytać co oznacza która wielkość kropki.
+I czy przedstawiane są eksponaty o jeden dalej, czy wszystkie dalej na ścieżkach?
+Brakuje opisów.
+
+W zakładce 'ścieżki' można by wykorzystać rozwiązania z zakładki 'eksponaty'. I pokazywać typowe ścieżki rozpoczynające się od eksponatu X.
+
+Te dwie zakładki ratują trochę sytuacje.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+
+Zakładka 'Tabela' jest bardzo mało czytelna. Brak pełnych nazw eksponatu. pstwo ma 8 cyfr po kropce, zamiast pokazać tylko procenty zaokrąglone do 2 cyfr.
+
+Suwak 'liczba eksponatów' w wielu miejscach jest zbędny.
+
+Opis funkcji w pakiecie strasznie ubogi.
+
+Całość wygląda jak wczesny prototyp.
+Proszę znaleźć w nim silną stronę i ją solidnie dopracować.
+
+

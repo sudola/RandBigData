@@ -1,0 +1,15 @@
+Faza 2 - pakiet
+
+Pakiet jest rozbudowany, jeżeli chodzi o dokumentację i liczbę funkcji - robi wrażenie.
+
+Ale kod R w pakiecie można poprawić
+
+1. Nie powinno się wewnątrz funkcji wczytywać pakietów np. funkcją require
+require(pbapply)
+od tego są zależności
+
+2. Funkcja aktualizuj.baze() to jakiś koszmarny makaron niemożliwy do analizy.
+Funkcje powinny mieć długość co najwyżej jednego ekranu.
+
+3. W kodach jest dużo pustych linii, wygląda jak celowa obfuskacja kodu. Nawet jeżeli kod trafia od kilku różnych grup, to można było go przeformatować automatycznym formatR.
+
