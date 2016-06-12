@@ -54,9 +54,9 @@ Plan spotka&#324; MINI PW:
 * 25 IV [HPC + hydra](https://rawgit.com/pbiecek/RandBigData/master/MINI_2015/materialy/hpc/hpc.html), [prezentacja projektu 1, faza 3] 
 * 9 V [open CPU](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/REST.html)
 * 16 V [ankieta](http://goo.gl/forms/iWtckYi7Hc), prezentacja projektu 2, faza 1  `archivist::aread("pbiecek/Przewodnik/arepo/12b75717051be0ae516b900e1e70c049")`
-* 23 V [spark]
-* 30 V [archivist], prezentacja projektu 2, faza 2
-* 6 VI [sparkR]
+* 23 V [spark](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/Kornel.pdf)
+* 30 V [archivist](https://pbiecek.gitbooks.io/przewodnik/content/Programowanie/pazury/archivist.html), prezentacja projektu 2, faza 2
+* 6 VI [sparkR](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/sparkR_TM_pres.html), [plik R](https://github.com/pbiecek/RandBigData/blob/master/MINI_2016/materialy/spark_R_1.R)
 * 13 VI [zobaczymy], prezentacja projektu 2, faza 3 
 
 

@@ -1,0 +1,21 @@
+Package: OpinieOBankach
+Title: Analiza opinii z facebooka o bankach
+Version: 1.0
+Authors@R: c(person("Michał", "Stolarczyk", role = c("cre"), email= "stolarczykm@student.mini.pw.edu.pl"),
+      person("Michał", "Muck", role = c("ctb")),
+      person("Dorota", "Łępicka", role = c("ctb")),
+      person("Ewa", "Baranowska", role = c("ctb")),
+      person("Michał", "Resztak", role = c("aut")))
+Description: OpinieOBankach to pakiet pozwalający na pełną analizę danych dotyczących opinii o bankach, pobranych z Facebooka, poczynając od ich ściągnięcia, aktualizowania, raportowania, a kończąc na ich prezentacji.
+Depends:
+    R (>= 3.2.0)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Suggests: testthat
+Imports: stringi,
+    RSQLite,
+    parallel,
+    httr,
+	Rfacebook
