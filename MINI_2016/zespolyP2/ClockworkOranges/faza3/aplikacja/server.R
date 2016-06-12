@@ -2,10 +2,7 @@ library(ggplot2)
 library(stringi)
 library(dplyr)
 library(ClockworkOranges)
-source("filterByPlotDF.R", encoding = "cp1250")
 
-
-load("dane.rda")
 czeste <- list(ALIOR = filterByPlotDF("2013-06-20", "2016-02-28", dane$ALIOR),
                BZW = filterByPlotDF("2013-06-20", "2016-02-28", dane$BZW),
                ING = filterByPlotDF("2013-06-20", "2016-02-28", dane$ING))
