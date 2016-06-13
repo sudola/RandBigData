@@ -8,7 +8,7 @@
 #' @param npost minimalna liczba postów w wątku które są uwzględniane
 #' @param freq minimalna częstotliwość występowania słowa na post
 #' 
-#' @return zwraca listę ramek danych, ka¿dy element listy jest nazwany numerem wątku (tread)
+#' @return zwraca listę ramek danych, każdy element listy jest nazwany numerem wątku (tread)
 #' 
 
 filterByPlotList <- function(dateStart, dateStop, dane, npost=5, freq=0.5){
