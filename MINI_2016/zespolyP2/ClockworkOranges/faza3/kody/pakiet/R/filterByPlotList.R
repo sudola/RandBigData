@@ -1,14 +1,14 @@
-#' Funkcja znajduj¹ca jednotematyczne w¹tki
+#' Funkcja znajdująca jednotematyczne wątki
 #' 
-#' Funkcja znajduje w¹tki w których czêœciej ni¿ f wystêpuj¹ s³owa na post.
+#' Funkcja znajduje wątki w których częściej niż f występują słowa na post.
 #' 
-#' @param dateStart data pocz¹tku okresu w formacie "yyyy-mm-dd" jako character
-#' @param dateStop data koñca okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStart data początku okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStop data końca okresu w formacie "yyyy-mm-dd" jako character
 #' @param dane ramka danych z kolumnami: created_at, id, tread, rzeczownik
-#' @param npost minimalna liczba postów w w¹tku które s¹ uwzglêdniane
-#' @param freq minimalna czêstotliwoœc wytstêpowania s³owa na post
+#' @param npost minimalna liczba postów w wątku które są uwzględniane
+#' @param freq minimalna częstotliwość występowania słowa na post
 #' 
-#' @return zwraca listê ramek danych, ka¿dy element listy jest nazwany numerem w¹tku (tread)
+#' @return zwraca listê ramek danych, ka¿dy element listy jest nazwany numerem wątku (tread)
 #' 
 
 filterByPlotList <- function(dateStart, dateStop, dane, npost=5, freq=0.5){
