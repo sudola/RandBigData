@@ -1,14 +1,14 @@
-#' Funkcja znajduj¹ca jednotematyczne w¹tki
+#' Funkcja znajdujÄ…ca jednotematyczne wÄ…tki
 #' 
-#' Funkcja znajduje w¹tki w których czêœciej ni¿ f wystêpuj¹ s³owa na post.
+#' Funkcja znajduje wÄ…tki w ktÃ³rych czÄ™Å›ciej niÅ¼ f wystÄ™pujÄ… sÅ‚owa na post.
 #' 
-#' @param dateStart data pocz¹tku okresu w formacie "yyyy-mm-dd" jako character
-#' @param dateStop data koñca okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStart data poczÄ…tku okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStop data koÅ„ca okresu w formacie "yyyy-mm-dd" jako character
 #' @param dane ramka danych z kolumnami: created_at, id, tread, rzeczownik
-#' @param npost minimalna liczba postów w w¹tku które s¹ uwzglêdniane
-#' @param freq minimalna czêstotliwoœæ wystêpowania s³owa na post
+#' @param npost minimalna liczba postÃ³w w wÄ…tku ktÃ³re sÄ… uwzglÄ™dniane
+#' @param freq minimalna czÄ™stotliwoÅ›Ä‡ wystÄ™powania sÅ‚owa na post
 #' 
-#' @return zwraca ramek danych wszystkich wybranych s³ów z ich czêstoœciami 
+#' @return zwraca ramek danych wszystkich wybranych sÅ‚Ã³w z ich czÄ™stoÅ›ciami 
 #' 
 
 filterByPlotDF <- function(dateStart, dateStop, dane, npost=5, freq=0.5){
