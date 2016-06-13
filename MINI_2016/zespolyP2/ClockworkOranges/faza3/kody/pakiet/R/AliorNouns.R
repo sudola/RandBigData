@@ -1,4 +1,4 @@
-#' Przykładowe posty z facebookowego profilu Alior banku zrozbiciem na poszczególne rzeczowniki
+#' Przykładowe posty z facebookowego profilu Alior banku z rozbiciem na poszczególne rzeczowniki
 #' 
 #' Zbiór zwiera następujące kolumny:
 #' \itemize{
