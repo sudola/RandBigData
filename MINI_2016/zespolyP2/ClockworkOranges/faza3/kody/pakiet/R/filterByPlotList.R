@@ -1,14 +1,14 @@
-#' Funkcja znajdujÄ…ca jednotematyczne wÄ…tki
+#' Funkcja znajduj¹ca jednotematyczne w¹tki
 #' 
-#' Funkcja znajduje wÄ…tki w ktÃ³rych czÄ™Å›ciej niÅ¼ f wystÄ™pujÄ… jakieÅ› rzeczowniki per post. Dla kaÅ¼dego takiego wÄ…tku zwracana oddzielna ramka danych w liÅ›cie o nazwie tread_id wÄ…tku.
+#' Funkcja znajduje w¹tki w których czêœciej ni¿ f wystêpuj¹ s³owa na post.
 #' 
-#' @param dateStart data poczÄ…tku okresu w formacie "yyyy-mm-dd" jako character
-#' @param dateStop data koÅ„ca okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStart data pocz¹tku okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStop data koñca okresu w formacie "yyyy-mm-dd" jako character
 #' @param dane ramka danych z kolumnami: created_at, id, thread_id, rzeczownik
-#' @param npost minimalna liczba postÃ³w w wÄ…tku ktÃ³re sÄ… uwzglÄ™dniane
-#' @param freq minimalna czÄ™stotliwoÅ›c wytstÄ™powania sÅ‚owa na post
+#' @param npost minimalna liczba postów w w¹tku które s¹ uwzglêdniane
+#' @param freq minimalna czêstotliwoœc wytstêpowania s³owa na post
 #' 
-#' @return zwraca listÄ™ ramek danych, kaÅ¼dy element listy jest nazwany numerem wÄ…tku (thread_id)
+#' @return zwraca listê ramek danych, ka¿dy element listy jest nazwany numerem w¹tku (thread_id)
 #' @import dplyr
 #' @export
 
