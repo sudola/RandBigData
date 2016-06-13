@@ -1,22 +1,23 @@
-#' Funkcja znajduj¹ca jednotematyczne w¹tki
+#' Funkcja znajdujÂ¹ca jednotematyczne wÂ¹tki
 #' 
-#' Funkcja znajduje w¹tki w których czêœciej ni¿ f wystêpuj¹ s³owa na post.
+#' Funkcja znajduje wÂ¹tki w ktÃ³rych czÃªÅ“ciej niÂ¿ f wystÃªpujÂ¹ sÂ³owa na post.
 #' 
-#' @param dateStart data pocz¹tku okresu w formacie "yyyy-mm-dd" jako character
-#' @param dateStop data koñca okresu w formacie "yyyy-mm-dd" jako character
-#' @param dane ramka danych z kolumnami: created_at, id, thread_id, rzeczownik
-#' @param npost minimalna liczba postów w w¹tku które s¹ uwzglêdniane
-#' @param freq minimalna czêstotliwoœc wytstêpowania s³owa na post
+#' @param dateStart data poczÂ¹tku okresu w formacie "yyyy-mm-dd" jako character
+#' @param dateStop data koÃ±ca okresu w formacie "yyyy-mm-dd" jako character
+#' @param dane ramka danych z kolumnami: created_at, id, tread, rzeczownik
+#' @param npost minimalna liczba postÃ³w w wÂ¹tku ktÃ³re sÂ¹ uwzglÃªdniane
+#' @param freq minimalna czÃªstotliwoÅ“c wytstÃªpowania sÂ³owa na post
 #' 
-#' @return zwraca ramek danych wszystkich wybranych s³ów z ich czêstoœciami
-#' @import dplyr
-#' @export
+#' @return zwraca ramek danych wszystkich wybranych sÂ³Ã³w z ich czÃªstoÅ“ciami 
+#' 
 
 filterByPlotDF <- function(dateStart, dateStop, dane, npost=5, freq=0.5){
+  require(dplyr)
+  dane%>%head()
   okres=dane%>%filter(as.character(dane$created_at)>=dateStart, as.character(dane$created_at)<=dateStop)
-  watki=okres%>%select(thread_id, id)%>%distinct(id)%>%group_by(thread_id)%>%summarise(ile=n())
-  rzeczowniki=okres%>%select(rzeczownik, thread_id)%>%group_by(rzeczownik, thread_id)%>%summarise(ile_rzecz=n())
-  razem=rzeczowniki%>%left_join(watki, by="thread_id")%>%mutate(f=ile_rzecz/ile)%>%ungroup()%>%filter(ile>2)%>%arrange(desc(f))
-  wazne=razem%>%filter(ile>=npost, f>=freq)%>%arrange(thread_id, desc(f))
-  wazne%>%left_join(okres%>%select(thread_id, created_at)%>%group_by(thread_id)%>%summarise(date=substr(min(as.character(created_at)), 1, 10)),by="thread_id")
+  watki=okres%>%select(tread, id)%>%distinct(id)%>%group_by(tread)%>%summarise(ile=n())
+  rzeczowniki=okres%>%select(rzeczownik, tread)%>%group_by(rzeczownik, tread)%>%summarise(ile_rzecz=n())
+  razem=rzeczowniki%>%left_join(watki, by="tread")%>%mutate(f=ile_rzecz/ile)%>%ungroup()%>%filter(ile>2)%>%arrange(desc(f))
+  wazne=razem%>%filter(ile>=npost, f>=freq)%>%arrange(tread, desc(f))
+  wazne%>%left_join(okres%>%select(tread, created_at)%>%group_by(tread)%>%summarise(date=substr(min(as.character(created_at)), 1, 10)),by="tread")
 }
