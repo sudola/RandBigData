@@ -1,0 +1,6 @@
+Członkowie grupy: Rafał Grądziel, Grzegorz Bajor
+
+Podsumowanie:
+    - Faza 1: analiza rzeczowników dla Banku BZWBK => próba wykrywania wpisów świadczących o pozytywnych/negatywnych wydarzeniach 
+    - Faza 2: OpenCpu stworzone dla grupy generującej raport
+    - Faza 3: dane ściągnięte z bazy stworzonej przez inna grupę podczas drugiej fazy => analiza rzeczowników dla wszystkich banków => na podstawie słownika próba diagnozowania "globalnych" problemów
