@@ -1,0 +1,137 @@
+---
+output: html_document
+runtime: shiny
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+# PRZY PIERWSZYM URUCHOMIENIU NALEZY ZAINSTALOWAC PAKIET:
+# library(devtools)
+# install_github(rep="resztakm/Faza3", subdir = "/folder/")
+library(plotly)
+library(dplyr)
+library(magrittr)
+library(shiny)
+library(ggplot2)
+library(pakiet)
+
+ 
+data(dane)
+data(rozklady)
+
+info <- pakiet::info()
+ 
+
+renderUI(HTML(paste("<font size='4'>Michał Resztak,  Zosia Rogala,  Robert Trąbczyński</font>", "</br></br>")))
+renderUI(HTML(paste("<b>","<font size='6'>Analiza postów - szukanie awarii</font>", "</b>", "</br></br>")))
+
+
+inputPanel(
+  
+  renderUI(HTML(paste("<font size='3'>Wybierz słowo do analizy oraz nazwę banku z listy:</font>", "</br></br>"))),
+  selectInput("slowo", label = "Wybór słowa:",
+              choices = c("awaria", "błąd", "wirus", "niesprawny",                                                         "wadliwy", "niedziałający", "problem", "niedogodność", "oszust",
+                          "utrudnienie", "zepsuć", "paść"), selected = "awaria"),
+  selectInput("bank", label = "Wybór banku:",
+              choices = c("wszystkie", "AliorBankSA", "INGBankSlaski", "bzwbk"), selected = "wszystkie"),
+  selectInput("iloscpostow", label = "Ilość postów do wyświetlenia:",
+              choices = 1:20, selected = 5)
+)
+
+renderUI({
+  HTML(paste("</br></br>", "Poniższy wykres ilustruje częstość występowania kluczowych słów w postach wybranych banków.", "</br>"))
+})
+
+
+renderPlotly({
+  
+  if (input$bank == "wszystkie") {
+    filtruj <- rozklady %>% filter(baza == input$slowo)
+  } else {
+    filtruj <- rozklady %>% filter(baza == input$slowo, page_name == input$bank)
+  }
+  
+  tab <- table(filtruj$date)
+  if (length(tab) > 0) {
+    # p <- qplot(as.Date(filtruj$date), binwidth = 10, geom = "histogram", fill = I("red"),
+    #       alpha = I(0.5), main = "Częstość występowania wybranego słowa w postach",
+    #       xlab = "Daty", ylab = "Ilość wystąpień")
+
+
+    p <- plot_ly(list(data = filtruj), x = as.Date(filtruj$date), type = "histogram")%>%
+          layout(xaxis = list(title="Daty"), yaxis = list(title="Ilość wystąpień"))
+  }
+  
+})
+
+
+renderUI(HTML(paste("</br></br>", "<b>","<font size='3'>Przykładowe posty z okresów, w których wybrane do analizy słowo występowało najczęściej:</font>", "</b>", "</br></br>")))
+
+
+renderUI({
+  
+  if (input$bank == "wszystkie") {
+    id <- rozklady %>% filter(baza == input$slowo) %>% group_by(date, id) %>% 
+      summarize(ile = n())
+  } else {
+    id <- rozklady %>% filter(baza == input$slowo, page_name == input$bank) %>% 
+      group_by(date, id) %>% summarize(ile = n())
+  }
+  
+  daty <- id %>% group_by(date) %>% summarise(suma = sum(ile)) %>% arrange(desc(suma))
+  tab <- unique(id[id$date %in% daty$date, ]$id)
+  
+  if (length(tab) > 0) {
+    indeksy <- dane$id %in% tab
+    minimum <- input$iloscpostow
+    
+    HTML(paste(dane[indeksy, ]$date[1:minimum], dane[indeksy, ]$body[1:minimum], 
+               sep = "<br/>", collapse = "<br/><br/>"))
+  } else {
+    HTML(paste("Brak wystapien danego slowa!"))
+  }
+  
+})
+
+renderUI(HTML(paste("</br></br>", "<b>","<font size='3'>Analiza ilości komentarzy, udostępnień i polubień</font>", "</b>", "</br></br>")))
+
+
+inputPanel(
+  
+  renderUI(HTML(paste("<font size='3'>Wybierz bank oraz typ danych do analizy:</font>", "</br></br>"))),
+  selectInput("bank2", label = "Wybierz bank:", choices = c("Alior Bank", "ING Bank Śląski",
+                                                            "BZ WBK"),
+              selected = "AliorBank"),
+  selectInput("typ", label = "Wybierz typ wykresu:", choices = c("comments_count",
+                                                                 "shares_count", "like_count"),
+              selected = "comments_count"),
+  selectInput("ilepostow", label = "Wybierz ilość postów do wyświetlenia:", 
+              choices = 1:30, selected = 5)
+)
+
+
+renderUI({
+  HTML(paste("</br>", "Wykres ilustruje popularność postów napisanych przez internautów, mierzoną ilościami komentarzy, udostępnień albo polubień. Poniżej wypisane są posty z dnia, w którym użytkownicy byli najbardziej aktywni (w komentowaniu lub udostępnianiu).", "</br></br>"))
+})
+
+
+renderPlot({
+  
+  typ = input$typ
+  bank = input$bank2
+
+  tmp <- wypiszDane(typ, bank, info)
+  rysuj(tmp$dane, tmp$ylab, tmp$title, tmp$crit)
+  
+})
+
+
+renderUI({
+  typ = input$typ
+  bank = input$bank2
+  
+
+  tmp <- wypiszDane(typ, bank, info)
+  HTML(paste(wypiszPosty(bank, tmp$Daty, input$ilepostow, info), collapse = "</br>"))
+})
+
+```
