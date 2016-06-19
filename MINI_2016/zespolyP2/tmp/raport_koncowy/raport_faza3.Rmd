@@ -1,0 +1,157 @@
+---
+title: "Raport dotyczący aktywności na fanpage'u ING Banku Śląskiego"
+date: '`r dzien`'
+output: pdf_document
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(stringi)
+library(pander)
+library(ggplot2)
+library(reshape2)
+
+```
+
+Raport ten zawiera podstawowe statystyki oraz weryfikację poprawności działania systemu informatycznego **ING Banku Śląskiego** na podstawie aktywności użytkowników na fanpage'u banku z ostanich 24 godzin od `r as.character(now)`.
+
+# Podstawowe statystyki
+
+```{r, echo=FALSE, message=FALSE}
+post_n <- dane_wczoraj %>% nrow
+thread_n <- dane_wczoraj %>% filter(is.na(parent_id)) %>% nrow
+thread_ans_n <- dane_wczoraj %>%  filter(!is.na(parent_id)) %>% count(parent_id ) 
+dane_wczoraj %>% 
+   filter(is.na(parent_id))%>%
+   select(id) %>% 
+   left_join(., y = thread_ans_n, by=c("id"="parent_id")) -> thread_ans_count
+thread_ans_count$n <- ifelse(is.na(thread_ans_count$n),0,thread_ans_count$n)
+
+post_word <- dane_wczoraj %>% select(body) %>% unlist %>% stri_count_words
+
+user_n <- dane_wczoraj %>% count(user_name) %>% arrange(desc(n))
+
+time_act <- dane_wczoraj %>% select(created_at) %>% t() %>% stri_sub(from=12,to=13) %>% as.numeric
+time_act <- cbind(godz=time_act, licz=1) %>% as.data.frame
+r <- time_act %>% count(godz)
+licznosci <- numeric(24)
+for(i in 1:nrow(r)){
+   licznosci[r$godz[i]+1] <- r$n[i]
+}
+
+
+
+```
+
+
+W danym czasie użytkownicy napisali **`r post_n`** postów/y (za posty uważamy zarówno posty na tablicy \newline jak i komentarze pod nimi).
+
+Ilość wątków wyniosła **`r thread_n`** zaś mediana liczby odpowiedzi w wątku: **`r median(thread_ans_count$n)`** (za wątek uznajemy post na tablicy wraz z wszystkimi komentarzami pod nim).
+
+# Rozkład liczby słów w postach
+
+```{r, echo=FALSE, fig.width = 6, fig.height = 2.5,fig.align="center", message=FALSE }
+
+df_post_word <- data.frame(value=post_word, variable=dzien)
+ggplot(df_post_word, aes(y=value, x=variable))+geom_boxplot(fill="paleturquoise2", width = 0.55)+
+   stat_summary(fun.y=mean, geom="point", shape=19, size=2, col = "firebrick3")+
+   labs(y="Liczba słów", x="",title="" ) +
+   scale_x_discrete(labels="")+
+   coord_flip()
+
+```
+
+\newpage
+# Tabela prezentująca 10 (bądź mniej) najaktywniejszych \newline użytkowników
+```{r, echo=FALSE, comment=""}
+user_n[order(unlist(user_n[,2]),decreasing=T),] %>% head(10) %>% pander
+```
+
+# Rozkład aktywności z podziałem na godziny
+```{r, echo=FALSE, fig.width = 6, fig.height = 2.5,fig.align="center" , message=FALSE}
+df_licznosci <- data.frame(licznosci=licznosci)
+df_licznosci_melt <- melt(df_licznosci)
+
+ggplot(df_licznosci_melt, aes(x=seq(0,23), y=value))+geom_bar(stat="identity",fill="paleturquoise2") +
+   labs(y="Liczba postów", x="Godzina",title="" ) +
+   scale_x_continuous(breaks = seq(0,23)) +
+   scale_y_continuous(breaks = seq(0,max(licznosci),2))
+
+```
+
+# Wydźwięk postów
+```{r, echo=FALSE}
+wydzwiek_wczoraj %>% count(jakie) -> licznosci_wydziwiek
+colnames(licznosci_wydziwiek)[1] <- "wydzwięk"
+licznosci_wydziwiek %>% pander
+```
+
+\newpage
+
+# Tematyka postów
+
+```{r ,echo=FALSE, message=FALSE, warning=FALSE}
+problem <- left_join(as.data.frame(slowa), licznosci_wczoraj, by=c("slowa"="podstawa"))
+problem$n <- ifelse(is.na(problem$n),0,problem$n)
+czy_problem <- pstwa<0.05
+problem <- cbind(problem, pstwa, czy_problem)
+
+```
+
+* Tabela  10 słów występujących najczęściej
+```{r, echo=FALSE, comment=""}
+licznosci_wczoraj %>% head(10) %>% pander
+```
+
+
+## Weryfikacja problemów technicznych
+
+Sprawdźmy na podstawie aktywności użytkowników na fanpage'u czy w ostatnich 24 godzinach w systemie banku nie pojawiły się jakieś problemy techniczne. W tym celu wyodrębniono 6 najpopularniejszych słów związanych z problemami (na podstawie danych historycznych) - dla nich to zostanie przeprowadzona analiza z uwzględnieniem dnia tygodnia, który rozpatrujemy (podział na dni robocze i weekendy(sobota, niedziela)).
+
+# Tabela zawierająca informację o słowach powiązanych z \newline problemami technicznymi
+```{r, echo=FALSE, comment=""}
+pander(problem)
+```
+**n** - ilość wystąpień słowa w danym dniu
+
+**pstwo** - wartość ogona dystrybuanty empirycznej dla słowa (zbudowanej na historycznych danych)
+
+```{r , echo=FALSE}
+# problem$czy_problem[2]<-TRUE
+show.text <- any(problem$czy_problem)
+if (show.text==FALSE) {tmp="nie wykryto problemów technicznych"} else {tmp="wykryto problemy techniczne"}
+```
+
+**Zatem `r tmp`.**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
