@@ -1,0 +1,303 @@
+---
+title: "Projekt II - raport"
+author: "Magdalena Mazurek, Aleksander Panimash, Rafał Rutkowski, Bartosz Topolski"
+date: "19 czerwca 2016"
+output: html_document
+---
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+```
+
+### Cel projektu
+
+Celem drugiego projektu było stworzenie algorytmu pozwalającego na analizę postów na fanpage'u banku pod kątem wykrywania ewentualnych problemów technicznych z funkcjonowaniem usług bankowych. Nasze działania były oparte o dane historyczne zawierające 15193 posty ze strony ING Banku śląskiego. Oprócz danych wykorzystaliśmy także narzędzie do korekty językowej tekstu, oraz do rozbijania zdań na pojedyńcze słowa wraz z uwzględnieniem własności tych słów.  
+
+### Wstępna obróbka danych
+
+Dane, które otrzymaliśmy dotyczyły kilku banków. Zawierały one posty umieszczane na fanpage'ach wraz z informacją o użytkowniku, dacie, jak i sam post.
+Na początku wybraliśmy posty dotyczące ING Banku śląskiego. Przy pomocy otrzymanych webserwisów zrobiliśmy korektę każdego postu, a następnie zrobiliśmy rozkład morfologiczny postu. Z rozkładu wybraliśmy dwa elementy: bazę słowa oraz kategorię gramatyczną. Poniżej przedstawiony jest tabela, na której bazowaliśmy oraz kod jej powstawania.
+
+```{r, echo=FALSE}
+load("dane_ing_rozklad.rda")
+pander::pandoc.table(head(dane_ing_rozklad[,-c(6,7)]))
+```
+
+```{r, eval=FALSE}
+# dane z dodatkowa kolumna body_korekta
+library(parallel)
+rdzen <- detectCores()-1
+klaster <- makeCluster(rdzen)
+clusterEvalQ({library(httr)}, cl = klaster)
+
+lista <- parLapply(klaster, as.character(dane_ing[,"body"]), function(a){
+  set_config( config( ssl_verifypeer = 0L, ssl_verifyhost = 0L ) )
+  korekta_tmp <- POST("https://ec2-54-194-28-130.eu-west-1.compute.amazonaws.com/ams-ws-nlp/rest/spell/single",
+                      body = list(message=list(body=a), token="2$zgITnb02!lV"),
+                      add_headers("Content-Type" = "application/json"), encode = "json")
+  return(content(korekta_tmp, "parsed")$output)
+})
+stopCluster(klaster)
+
+korekta <- do.call(rbind,lista)
+dane_ing_kor <- cbind(dane_ing, "body_korekta"=as.vector(korekta))
+save(dane_ing_kor, file="~/dane_ing_kor.rda")
+
+
+# tabela z rozkladem morfologicznym
+library(parallel)
+rdzen <- detectCores()-1
+klaster <- makeCluster(rdzen)
+clusterEvalQ({library(httr)
+  library(stringi)}, cl = klaster)
+clusterExport(klaster, "dane_ing_kor")
+
+lista2 <- parLapply(klaster, 1:nrow(dane_ing_kor), function(indeks){
+   x <- as.character(dane_ing_kor[indeks,"body_korekta"])
+   set_config( config( ssl_verifypeer = 0L, ssl_verifyhost = 0L ) )
+   nlp <- POST("https://ec2-54-194-28-130.eu-west-1.compute.amazonaws.com/ams-ws-nlp/rest/nlp/single",
+               body = list(message=list(body=x), token="2$zgITnb02!lV"),
+               add_headers("Content-Type" = "application/json"), encode = "json")
+   tmp_rozklad <- content(nlp, "parsed")
+   
+   lista_tmp <- lapply(seq_len( length(tmp_rozklad[[1]]) ), function(y){
+      tmp_msd <- tmp_rozklad[[1]][[y]]$msd
+      if (is.null(tmp_msd)) {tmp_msd <- NA}
+      return(c(tmp_msd,tmp_rozklad[[1]][[y]]$orth,tmp_rozklad[[1]][[y]]$base))
+   })
+   
+   df2 <- do.call(rbind,lista_tmp)
+   if(is.null(df2)) {
+      df3 <- cbind("id"=dane_ing_kor$id[indeks], "data"=as.character(dane_ing_kor$created_at[indeks]),
+                   "rozklad"=NA, "podstawa"=NA,"wyraz"=NA)
+      df4 <- as.data.frame(df3)
+      return(df4)
+   } else {
+      df2 <- as.data.frame(df2)
+      df3 <- cbind("id"=dane_ing_kor$id[indeks], "data"=as.character(dane_ing_kor$created_at[indeks]),
+                   "rozklad"=as.character(df2$V1), "podstawa"=as.character(df2$V3),"wyraz"=as.character(df2$V2))
+      df4 <- as.data.frame(df3)
+   return(df4)
+   }
+})
+stopCluster(klaster)
+
+dane_ing_rozklad <- do.call(rbind,lista2)
+dane_ing_rozklad_czy_na <- apply(dane_ing_rozklad, 1, function(r){
+   return(!all(is.na(r)))
+})
+dane_ing_rozklad <- dane_ing_rozklad[dane_ing_rozklad_czy_na,]
+save(dane_ing_rozklad, file="~/dane_ing_rozklad.rda")
+
+
+
+```
+
+### Analiza problemu
+
+Podczas pierwszej fazy zbadaliśmy w jaki sposób możemy badać, czy posty pisane danego dnia są w jakiś sposób "niestandardowe" w porównaniu do okresu z danych historycznych. Z tabeli zawierającej najczęściej pojawiające się słowa wybraliśmy 6 takich, które naszym zdaniem mogłyby świadczyć o występieniu awarii - te słowa to "problem", "działać", "utrudnienie", "reklamacja", "awaria" oraz "błąd". Następnie chcieliśmy wybrać sposób badania, czy danego dnia któreś z tych słów wystąpiło podejrzanie dużo razy.  
+Pierwszym pomysłem było traktowanie poszczególnych wystąpień słów jako zdarzenia odbywające się z pewną ustaloną częstotliwością (inną dla każdego słowa). Możemy wtedy przyjąć, że liczba wystąpień danego słowa w ciągu dnia ma rozkład Poissona, wystestymować parametr $\lambda$ na podstawie danych historycznych, a następnie dla nowych danych sprawdzać, czy liczba wystąpień badanego słowa jest prawdopodobna (według założonego rozkładu).  
+W celu sprawdzenia, czy rozkład wystąpień słowa to faktycznie rozkład Poissona, sporządziliśmy histogramy dla interesujących nas słów. Oto jeden z nich:
+
+```{r, echo = FALSE}
+load("dane_zliczone_DzieniGodzina.rda")
+ilosc_work <- 661
+d %>% filter(podstawa == "problem", godzina %in% 0:24,dzien %in% 1:5) %>%
+  count(data) -> tmp
+tmp <- tmp$n
+tmp <- c(tmp, rep(0, ilosc_work - length(tmp)))
+ggplot(mapping = aes(tmp)) + geom_histogram(binwidth = 1, color = "grey") + xlab("") + ylab("") + ggtitle("Rozkład liczności wystąpień słowa 'problem'")
+```
+
+Jak widać, otrzymany rozkład nie jest rozkładem Poissona. Podobne wyniki otrzymaliśmy dla pozostałych słów, dlatego uznaliśmy, że to podejście jest niewłaściwe.
+
+Postanowiliśmy więc uciec się do nieparametrycznej formy wyznaczenia rozkładu poprzez stworzenie dystrybuant empirycznych dla dziennej ilości wystąpień interesujących nas słów. Zostały one zbudowane na danych historycznych i zapisane do plików `.rda`, aby można było je wykorzystać w późniejszej analizie. Oto fragment kodu odpowiedzialny za budowanie dystrybuant:
+
+```{r, eval = FALSE}
+slowo_cdf <- function(slowo, godziny = 0:24, dni = 1:5){
+  ilosc_work <- 661
+  ilosc_weekend <- 265
+  d %>% filter(podstawa == slowo, godzina %in% godziny,dzien %in% dni) %>%
+    count(data) -> tmp
+  tmp <- tmp$n
+  tmp <- c(tmp, rep(0, times = ilosc_work - length(tmp) ))
+  return(ecdf(tmp))
+}
+
+cdfy <- lapply(slowa, slowo_cdf, godziny = 0:24)
+
+names(cdfy) <- slowa
+```
+
+Stworzona funkcja pozwala na dobranie odpowiedniego przedziału godzin i dni, aczkolwiek ograniczyliśmy się tylko do podziału na tydzień/weekend. Przy tworzeniu dystrybuant uwzględniliśmy także dni, w których dane słowa nie wystąpiły - inaczej zakładalibyśmy, że codziennie każde słowo pojawia się conajmniej raz.  
+Testy tej metody oparte na danych historycznych pokazały, że jest ona użyteczna - wśród dni, dla których prawy ogon dystrybuanty przyjmuje wartość mniejszą niż $0.05$, zdecydowana większość zawierała posty klientów skarżących się na trudności techniczne z działaniem różnych usług bankowych. 
+
+### Narzędzie do wykrywania problemów
+
+Pierwszą częścią narzędzia jest skrypt, który podlicza wystąpienia kluczowych słów w ciągu ostatnich 24 godzin przed jego wywołaniem, sprawdza odpowiednie prawdopodobieństwa za pomocą wcześniej wyestymowanych dystrybuant, a następnie w przypadku przekroczenia progu $0.05$ przez którąś z otrzymach wartości generuje raport dotyczący analizowanego przedziału czasowego.  
+Niestety ze względu na to, że podczas trzeciej fazy wrócilismy do pierwotnego modelu pracy w grupach nie mieliśmy możliwości przetestowania algorytmu na danych pobieranych w czasie rzeczywistym, gdyż grupa odpowiedzialna za bazę danych zaniechała jej dalszego usprawniania. Dlatego ograniczyliśmy się do testów na danych historycznych.
+
+```{r, eval = FALSE}
+load("dane_ing_rozklad.rda")
+load("dane_ing_kor.rda")
+load("cdfy_tydzien.rda")
+load("cdfy_weekend.rda")
+load("final.rda")
+load("rama.rda")
+library(dplyr)
+library(stringi)
+
+# kodowanie danych w przypadku systemu Windows
+if(.Platform$OS.type == "windows") {
+  dane_ing_kor$body_korekta <- stri_encode(as.character(dane_ing_kor$body_korekta), from = "utf8", to = "cp1250")
+  dane_ing_kor$body <- stri_encode(as.character(dane_ing_kor$body), from = "utf8", to = "cp1250")
+  dane_ing_kor$user_name <- stri_encode(as.character(dane_ing_kor$user_name), from = "utf8", to = "cp1250")
+  dane_ing_rozklad$podstawa <- stri_encode(as.character(dane_ing_rozklad$podstawa), from = "utf8", to = "cp1250")
+}
+
+
+now <-as.POSIXlt(strptime("2015-07-27 17:00:01", "%Y-%m-%d %H:%M:%S"))
+weekday <- now$wday
+
+### selekcja czasów
+
+time_begin <- now - as.difftime(1, unit="days")
+
+final %>% filter(as.POSIXct(data)<= now & as.POSIXct(data) >= time_begin) -> wydzwiek_wczoraj
+dane_ing_kor %>% filter(as.POSIXct(created_at)<= now & as.POSIXct(created_at) >= time_begin) -> dane_wczoraj
+dane_ing_rozklad %>% filter(as.POSIXct(data)<= now & as.POSIXct(data) >= time_begin) -> rozklady_wczoraj
+rozklady_wczoraj %>% count(podstawa) %>% arrange(desc(n))-> licznosci_wczoraj
+
+### sprawdzanie słów
+
+slowa <- c("problem", "działać", "utrudnienie", "reklamacja", "awaria", "błąd")
+slowa <- sort(slowa)
+
+# dni tygodnia numerowane od 0
+if(weekday %in% c(0,6)){
+  cdfy <- cdfy_weekend
+}else{
+  cdfy <- cdfy_tydzien
+}
+pstwa <- rep(1,6)
+for(i in 1:6){
+  slowo <- slowa[i]
+  wynik <- 1- cdfy[[slowo]](licznosci_wczoraj$n[licznosci_wczoraj$podstawa == slowo])
+  if(length(wynik)>0) pstwa[i] <- wynik
+}
+
+dzien <- stri_sub(now, 1, 10)
+nazwa_pliku <- stri_replace_all_fixed(as.character(now),pattern = c(":"), replacement = "_")
+
+rmarkdown::render("raport_faza3.Rmd", encoding = "utf8", output_file = paste0("raport", nazwa_pliku, ".pdf"))
+```
+
+### Raport
+
+Raport, który jest automatycznie generowany jest w formacie pdf o nazwie (z dnia 27 lipca 2015 roku z godziny 15:00:01): `raport2015-07-27 15_00_01`.
+
+Raport na wejściu ma podawane cztery ramki danych, z których korzysta:
+
+* `dane_wczoraj` - tabela z postami z ostatnich 24 godzin,
+* `rozklady_wczoraj` - tabela z rozkladami postów z ostatnich 24 godzin,
+* `wydzwiek_wczoraj` - tabela z informacją o wydźwięku dla każdego postu,
+* `licznosci_wczoraj` - tabela z licznościami słów z postów.
+
+##### **Podstawowe statystyki**
+Zawierają informację o ilości osób, która umieściła post oraz o liczbie wątków (wraz z medianą liczby odpowiedzi). 
+
+```{r, eval=FALSE}
+post_n <- dane_wczoraj %>% nrow
+thread_n <- dane_wczoraj %>% filter(is.na(parent_id)) %>% nrow
+thread_ans_n <- dane_wczoraj %>%  filter(!is.na(parent_id)) %>% count(parent_id) 
+dane_wczoraj %>% 
+   filter(is.na(parent_id))%>%
+   select(id) %>% 
+   left_join(., y = thread_ans_n, by=c("id"="parent_id")) ->thread_ans_count
+thread_ans_count$n <- ifelse(is.na(thread_ans_count$n),0,thread_ans_count$n)
+```
+
+##### **Rozkład liczby słów w postach**
+Zaprezentowanie za pomocą wykresu pudełkowego rozkładu liczby słów w postach.
+```{r, eval=FALSE}
+post_word <- dane_wczoraj %>% select(body) %>% unlist %>% stri_count_words
+df_post_word <- data.frame(value=post_word, variable=dzien)
+
+ggplot(df_post_word, aes(y=value, x=variable))+geom_boxplot(fill="paleturquoise2", width = 0.55)+
+   stat_summary(fun.y=mean, geom="point", shape=19, size=2, col = "firebrick3")+
+   labs(y="Liczba słów", x="",title="" ) +
+   scale_x_discrete(labels="")+
+   coord_flip()
+```
+
+##### **Najaktywniejsi użytkownicy**
+Tabela prezentująca 10 (bądź mniej) użytkowników, którzy byli najbardziej aktywni pod względem liczby umieszczonych postów.
+```{r, eval=FALSE}
+user_n <- dane_wczoraj %>% count(user_name) %>% arrange(desc(n))
+user_n[order(unlist(user_n[,2]),decreasing=T),] %>% head(10) %>% pander
+```
+
+##### **Rozkład aktywności**
+Wykres słupkowy prezentujący rozkład aktywności z podziałem na godziny (aktywność rozumiemy jako liczbę umieszczonych postów).
+```{r, eval=FALSE}
+time_act <- dane_wczoraj %>% select(created_at) %>% t() %>% stri_sub(from=12,to=13) %>% as.numeric
+time_act <- cbind(godz=time_act, licz=1) %>% as.data.frame
+r <- time_act %>% count(godz)
+licznosci <- numeric(24)
+for(i in 1:nrow(r)){
+   licznosci[r$godz[i]] <- r$n[i]
+}
+
+df_licznosci <- data.frame(licznosci=licznosci)
+df_licznosci_melt <- melt(df_licznosci)
+
+ggplot(df_licznosci_melt, aes(x=seq(0,23), y=value))+geom_bar(stat="identity",fill="paleturquoise2") +
+   labs(y="Liczba postów", x="Godzina",title="" ) +
+   scale_x_continuous(breaks = seq(0,23)) +
+   scale_y_continuous(breaks = seq(0,max(licznosci),2))
+```
+
+##### **Wydźwięk postów**
+Tabela informująca o ilości postów negatywnych, neutralnych oraz pozytywnych z ostatnich 24 godzin.
+```{r, eval=FALSE}
+wydzwiek_wczoraj %>% count(jakie) -> licznosci_wydziwiek
+colnames(licznosci_wydziwiek)[1] <- "wydzwięk"
+licznosci_wydziwiek %>% pander
+```
+
+##### **Tematyka postów oraz weryfikacja problemu**
+Zaprezetowanie tabeli ze złowami, które pojawiały sie najczęściej.
+```{r, eval=FALSE}
+licznosci_wczoraj <- licznosci_wczoraj[stri_length(licznosci_wczoraj$podstawa)>3,]
+licznosci_wczoraj %>% head(10) %>% pander
+```
+
+Do weryfikacji problemów wykorzystano dystrybuanty skonstruowane na dancyh historycznych. W raporcie zaprezentowano tabelę, która informuje nas o ilości wystąpięń wyodrębnionych słów, o wartości ogona dystrybuanty emiprycznej oraz zawiera informację czy dane słowo wykryło problem.
+
+```{r, eval=FALSE}
+problem <- left_join(as.data.frame(slowa), licznosci_wczoraj, by=c("slowa"="podstawa"))
+problem$n <- ifelse(is.na(problem$n),0,problem$n)
+
+pstwo <- numeric(length(slowa))
+for(i in 1:length(slowa)){
+   x <- problem[i,]
+   f <- cdfy[[as.character(x[1])]]
+   pstwo[i] <- 1-f(as.numeric(x[2]-1))
+}
+czy_problem <- pstwo<0.05
+problem <- cbind(problem, pstwo, czy_problem)
+pander(problem)
+```
+
+
+### Analiza wydźwięku
+
+Rozwiązanie oparte o sprawdzanie częstotliwości występowania kilku ustalonych słów ma swoje wady - najważniejszą jest ta, że jeśli wystąpi problem inny niż te zawarte w danych historycznych, to nasz algorytm może go nie wykryć, ze względu na nowe słownictwo pojawiające się w postach. Dlatego postanowiliśmy użyć bardziej uniwersalnej metody - analizy wydźwięku postów. Plik `rama.rda` zawiera ramkę danych z podstawowymi statystykami dla każdego z postów, którą możemy dodać do głównej ramki poprzez połączenie po kolumnie `id`. Oto kilka przykładowych wierszy z tej ramki:
+
+```{r, echo = FALSE}
+load("rama.rda")
+head(rama)
+```
+
+Mając gotową ramkę z intymi informacjami, oceniliśmy działanie kilku metod klasyfikowania postów. Ostatecznie zdecydowaliśmy, że post uznajemy za negatywny, jeśli przynajmniej $10 \%$ słów w nim zawartych ma ocenę negatywną. Za pomocą tak skonstruowanej metody udało się wykryć dni, w których nastąpiły problemy techniczne (na przykład 23.01.2014).  
+Ta metoda niestety również jest bardzo ograniczona. Tak jak w przypadku poprzedniego sposobu, jesteśmy ograniczeni przez wielkość słownika (aczkolwiek w tym przypadku słownik można bardzo łatwo rozszerzać o nowe słowa). Nawet jeśli w jakiś sposób ominiemy ten problem, to negatywny wydźwięk komentarza wcale nie musi świadczyć o wystąpieniu awarii - może po prostu być przejawem tego, że osoba (niekoniecznie klient) po prostu wyraża swoją opinię na jakiś temat związany z bankiem. Przykładowo, za pomocą tej metody udało nam się znaleźć dzień (21-12-2015), w którym bardzo dużo osób krytykowało bank ING za poglądy polityczne Marka Kondrata.  
