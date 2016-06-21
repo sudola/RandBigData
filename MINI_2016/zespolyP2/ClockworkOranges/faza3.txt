@@ -1,0 +1,38 @@
+Faza 3
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Pakiet przygotowany poprawnie, z dokumentacją i testami, naprawdę solidnie wykonany.
+Dokumentacja jest dopracowana, choć przydałby się w niej spis treści.
+Aplikacja ma interesujące rozwiązania (dopracowany interface, interaktywność po kliknięciu na punkty).
+
+Największym ograniczeniem jest to, że dane są przechowywane w pakiecie.
+Jakakolwiek próba aktualizacji danych wymaga przebudowania pakietu.
+Brakuje też instrukcji, jak takie dane należało by dodać (wygenerować?).
+Za ten brak odjąłbym więcej punktów, gdyby nie to, że i dokumentacja i aplikacja i reszta pakietu robią naprawdę dobre wrażenie.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Jest usuwanie stop-wordsów i sprowadzenie do rzeczowników/czasowników.
+
+To czego pracuje to bardziej złożona analityka.
+Obecnie do wyboru są tylko 4 słowa kluczowe a analiza sprowadza się do wyszukiwania wątków, gdzie te słowa często wystąpiły.
+Wyniki to pojedynczy wykres przedstawiający w sumie bardzo niewiele danych (liczba słów/data).
+Ta cześć mogłaby być zdecydowanie bardziej rozbudowana.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Interface aplikacji dosyć czytelny. 
+Dostępna jest też dokumentacja, trudno więc zarzucić, że czegoś nie wiadomo.
+Sama dokumentacja mogłaby być podpięta w aplikacji jako np. podstrona 'O aplikacji'. 
+Teraz brakuje pomocy i wyjaśnień w samej aplikacji.
+
+Punktacja: 
+
+Ad 1: 90%
+Ad 2: 70%
+Ad 3: 100%
+
