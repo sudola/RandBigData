@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#SBATCH -J irysowy_las
+#SBATCH -N 1
+#SBATCH --ntasks-per-node 10
+#SBATCH --mem 10000
+#SBATCH --time=72:00:00
+#SBATCH -A student2016a
+#SBATCH -p hydra
+#SBATCH --output="test.out"
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=student@mini.pw.edu.pl
+
+module load r/3.1.2
+R CMD BATCH test.R
