@@ -136,8 +136,10 @@ Tak przygotowany skrypt `test.batch` musimy przesłać na Hydrę - tak samo, jak
 scp ~/sciezka/do/pliku/test.batch student@login.icm.edu.pl:~/test/
 ```
 
-Następnie **wstawiamy nasze zadanie do kolejki** poleceniem:
+Otwieramy folder **test** i **wstawiamy nasze zadanie do kolejki** poleceniem:
 ```
+cd test
+
 sbatch test.batch
 ```
 Nasze zadanie jest w kolejce. Polecenie
