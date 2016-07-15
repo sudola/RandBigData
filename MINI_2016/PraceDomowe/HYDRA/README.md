@@ -108,7 +108,7 @@ Informacje o zapotrzebowaniu na zasoby komputera zamieszcza się w odpowiednim p
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=student@mini.pw.edu.pl
 
-module load r/3.1.2
+module load plgrid/apps/r/3.1.0
 R CMD BATCH test.R
 ```
 Omówmy  najważniejsze linie:
