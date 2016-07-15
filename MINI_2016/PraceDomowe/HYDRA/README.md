@@ -58,12 +58,14 @@ W trybie interaktywnym zainstalujemy w `R` pakiet `randomForest`, a w trybie wsa
 
 Tryb interaktywny uruchamiamy poleceniem
 ```
-srun -p hydra -A student2016a --pty bash -l
+srun -p plgrid -A student2016a --pty bash -l
 ```
 gdzie zamiast `student2016a` wpisujemy numer naszego grantu obliczeniowego.
-Aby uruchomić `R`'a, załadujmy moduł zawierający jego wersję `3.1.2`:
+Poleceniem ```module avail``` możemy wyświetlić dostępne moduły.
+
+Aby uruchomić `R`'a, załadujmy moduł zawierający jego wersję `3.1.0`:
   ```
-module load r/3.1.2
+module load plgrid/apps/r/3.1.0
 ```
 Teraz możemy normalnie uruchomić `R`'a:
 ```
@@ -101,7 +103,7 @@ Informacje o zapotrzebowaniu na zasoby komputera zamieszcza się w odpowiednim p
 #SBATCH --mem 10000
 #SBATCH --time=72:00:00
 #SBATCH -A student2016a
-#SBATCH -p hydra
+#SBATCH -p plgrid-long
 #SBATCH --output="test.out"
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=student@mini.pw.edu.pl
