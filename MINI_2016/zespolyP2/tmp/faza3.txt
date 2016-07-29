@@ -1,0 +1,58 @@
+Faza 3
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Mają państwo dużo kodu, ale w wielu miejscach nie jest on zbyt dopracowany.
+
+Przykładowo, w rozwiązaniu pliki są bez żadnej struktury, i dane i kody i prezentacja są w jednym katalogu.
+
+Jest wiele skryptów R, beż żadnego komentarza, instrukcji jak ich używać.
+W tych skryptach nie ma nawet zdania komentarza: neg.R, wagi.R
+
+W skryptach R są używane magiczne stałe, które uniemożliwią łatwe rozbudowanie kodu czy jakąkolwiek reużywalność.
+Przykładowo, zakładają państwo że musi być 6 słów i pętle są po 1:6 zamiast 1:length(slowa)
+
+Wszystkie dane ładowane są ze statycznych plików rda.
+W rzeczywistości takie rozwiązanie utrudnia lub uniemożliwia automatyzację W jaki sposób zarządzać coraz to nowymi wersjami plików rda przy których nie ma dat utworzenia.
+Dlaczego dane nie są nie w bazie danych?
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Analiza wydźwięku byłaby ciekawym pomysłem, jeżeli zostałaby w pełni wykorzystana.
+Teraz nie wiadomo dlaczego określone komentarze mają pozytywny/negatywny wydźwięk, trudno więc mieć zaufanie do systemu, który w żaden sposób nie był walidowany.
+
+Modelowanie z użyciem rozkładu Poissona byłoby ciekawe, szkoda że na podstawie jednego wykresu odrzucili Państwo cały ten pomysł.
+
+W raporcie jest zdanie
+'Testy tej metody oparte na danych historycznych pokazały, że jest ona użyteczna - wśród dni, dla których prawy ogon dystrybuanty przyjmuje wartość mniejszą niż 0.05, zdecydowana większość zawierała posty klientów skarżących się na trudności techniczne z działaniem różnych usług bankowych.'
+Ale nie ma żadnego potwierdzenia, że jest to się udało. 
+Przykład choć jednej sytuacji w której to się powiodło byłby bardzo wskazany.
+
+Skrypt wcale nie działa na ostatnie 24 godziny, bo obiekt ‘now’ jest ustalony na konkretną datę.
+Co więcej nie może być inaczej, ponieważ nie ma procesu który aktualizowałby dane (skąd mają się brać dane do analizy, ktoś będzie wkopiowywał przetworzone pliki rda?).
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Umieścili państwo dużo wyników, ale niestety ilość nie przełożyła się na jakość i wiele z nich jest niedopracowanych.
+Np. w raporcie przydałby się spis treści.
+Napis 'Zatem wykryto problemy techniczne' jest mało czytelny i na dalszej stronie. Jeżeli to on jest głównym punktem programu, celem dla którego tworzy się raport, to powinien być na początku i na czerwono.
+
+W raporcie w punkcie ‘tematyka postów’ z 10 pokazanych 5 to: . , z za to.
+A więc zupełnie bezużyteczne tokeny.
+Tabelka 'wydźwięk postów' pokazuje jakieś trzy liczby i nie sposób odgadnąć czy to dobrze czy źle. Czy było już lepiej czy nie było.
+
+Pomysł z prezentacją w html5 był ciekawy, ale prezentowane wpisy wyglądają jak ręczny wybór osoby, która je wszystkie czytała a nie żaden automat.
+
+W prezentacji pod tytułem 'Algorytm do wykrywania problemów technicznych' jest punkt 'Raporty nazywane według daty i godziny'. Nie widać związku jednego z drugim.
+
+Prezentacja 'raport_final.html' jest w sumie najciekawsza, ale szkoda że pozostałe pliki nie są bardziej dopracowane.
+
+Punktacja: 
+
+Ad 1: 70%
+Ad 2: 80%
+Ad 3: 80%
+

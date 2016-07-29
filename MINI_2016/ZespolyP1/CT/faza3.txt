@@ -1,0 +1,42 @@
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Pakiet jest ok, 
+funkcji jest dużo, są dane,
+funkcje są opisane.
+Ale w pakiecie nie ma testów i plik DESCRIPTION nie był aktualizowany.
+
+
+Aplikacja jest przyzwoita, są panele warunkowe, mikro style, reakcja na kliknięcia myszki
+fajerwerków nie ma jeżeli chodzi o layout,
+na jednej zakładce jest tylko jedna rzecz
+ale pomimo tej surowości całość jest dobra.
+
+Dokumentacja pakietu i aplikacji jest bardzo dobrze wykonana.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+
+Bardzo pomysłowe jest pokazywanie kolejnych losów po kliknięcie w aplikacji.
+
+Od strony modelarskiej mamy głównie częstości i analizę macierzy przejścia.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Z tych czterech zakładek pierwsze dwie są najsłabsze, można by je lepiej sformatować i umieścić na jednej zakładce.
+
+Ale ostatnie dwie zakładki są bardzo dobre. 
+Analiza ścieżek jest ciekawa, pokazywanie częstości kolejnych kroków też.
+
+Warto by te wykresy uzupełnić tabelami.
+
+
+Punktacja: 
+
+Ad 1: 90%
+Ad 2: 85%
+Ad 3: 95%
+
+

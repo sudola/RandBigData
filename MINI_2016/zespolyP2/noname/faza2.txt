@@ -1,0 +1,11 @@
+Faza 2 - baza danych
+
+1. Korzystanie z Dropboxa do wersjonowania plików to zły pomysł. 
+Konflikty, problemy z synchronizacją, to wszystko przyczyny dla których przechowujemy projekty na GitHubie a nie Dropboxie.
+
+2. SQLite to baza do małych danych z których korzysta się lokalnie.
+W tym przypadku znacznie lepiej użyć Postgresa. Łatwiej zarządzać poziomem dostępu, można jednocześnie pracować i aktualizować dane.
+
+3. W diagramie ERD do spójności brakuje zarówno zarówno relacji z parent_id jak i z from_id. 
+W bazie warto też trzymać oryginalną wiadomość przed skorygowaniem. Teraz nie sposób ją odzyskać.
+

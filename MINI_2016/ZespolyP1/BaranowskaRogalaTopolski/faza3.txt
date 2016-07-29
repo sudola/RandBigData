@@ -1,0 +1,54 @@
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Pakiet wykonany dobrze.
+Dużo funkcji, 
+odpowiednio udokumentowane, 
+jest opis pakietu oraz informacja o autorach.
+Z braków największym jest brak testów dla funkcji.
+
+
+Aplikacja jest przeciętnie dopracowana.
+Dane i funkcje powinny być ładowane z pakietów.
+A teraz w pliku server.r jest 'data("doStatystyk")', niepotrzebnie.
+Nie ma żadnych komentarzy, co robi która funkcja w aplikacji.
+Nie ma fajerwerków jeżeli chodzi o style, grafikę czy layout.
+
+Wiele opcji jest widocznych, nawet jeżeli zakładka nie pozwala na ich użycie.
+(to akurat największa wada aplikacji)
+Zakładka 'dane' u mnie nie działa.
+
+To że można klikać na mapie to dobry pomysł
+
+Opis całości w pliku html to dobry pomysł.
+
+Tytuły zakładek mało trafione. Tytuł 'Wykres' czy 'Dane' czy 'Statystyki' nic nie mówi o treści a jedynie o formacie.
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+Pokazywanie obu ścieżek to dobry pomysł.
+Pokazywanie częstości liniami to też dobry pomysł.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Funkcjonalność jest duża, choć mnogość opcji w interface i to, że nie są ukrywane gdy nic nie robią, bardzo utrudnia prace z aplikacją.
+Instrukcja obsługi dobrze że jest, ale jest wyjątkowo trudna w użycie.
+Lepiej już te komentarze umieścić w panelach odpowiadających funkcjonalnością.
+A jeżeli już musza być w osobnej zakładce, to powinny tam też być pliki graficzne.
+
+Nad funkcjonalnością można by jeszcze popracować.
+
+Generalnie zakładka 'Wykres' ma ciekawą treść, pozostałe zakładki przy niej wypadają znaczeni słabiej.
+
+
+Punktacja: 
+
+Ad 1: 80%
+Ad 2: 90%
+Ad 3: 80%
+
+
+
+

@@ -1,0 +1,1 @@
+SLURM Job_id=2424188 Name=RiBD_test Ended, Run time 00:00:12, COMPLETED, ExitCode 0

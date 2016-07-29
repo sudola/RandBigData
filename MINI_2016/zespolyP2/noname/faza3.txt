@@ -1,0 +1,62 @@
+Faza 3
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Zamiast zakomentowanych instrukcji 'PRZY PIERWSZYM URUCHOMIENIU NALEZY ZAINSTALOWAC PAKIET:'
+kod R mógłby sprawdzić, czy pakiet jest zainstalowany, a jeżeli nie sam go doinstalować.
+
+Pakiet nie jest wgrany na githuba na konto przedmiotu. 
+Dlaczego?
+
+Pakiet nazywa się 'pakiet'. 
+Nic ta nazwa nie wyjaśnia.
+
+Domumentacja pakietu jest skąpa, brakuje podstawowych danych:
+Title: What the Package Does (one line, title case)
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+License: What license is it under?
+Author: First Last [aut, cre]
+Maintainer: First Last <first.last@example.com>
+
+W przesłanym kodzie aplikacji nie ma ANI JEDNEGO KOEMNTARZA (poza poleceniem instalacji) ani instrukcji jak używać tego rozwiązania.
+
+Trochę (ale jedynie trochę) obraz ratuje użycie shiny i plotly.
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+
+Ponieważ nie ma możliwości wyboru dat, cały czas pokazują się te same komentarze i te same wykresy.
+Nawet nie trzeba ich przeliczać, ponieważ wyliczone są raz na sztywno wystarczyłoby je wszystkie umieścić.
+
+Prosta próba zmiany słowa zwraca błąd:
+'no applicable method for 'plotly_build' applied to an object of class "NULL"'
+
+Pokazane są dwa wykresy, z czego drugiego nie sposób odczytać.
+Nie ma informacji a nie dlaczego są one ważne, ani na co zwrócić uwagę.
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+Użycie biblioteki plotly to dobry pomysł, zawsze jakieś urozmaicenie.
+
+Lista do wyboru 'Wybierz ilość postów do wyświetlenia:' wydaje się być zupełnie nie potrzebna.
+
+Brakuje opisu czym jest pozioma niebieska linia a czym jest pozioma czerwona linia.
+
+Objaśnienia wykresów wprowadzają w błąd.
+Np. 'Poniższy wykres ilustruje częstość występowania kluczowych słów w postach wybranych banków. '
+Zamiast częstości pokazuje liczbę (którą niepoprawnie nazywa ilością).
+Nie dla słów kluczowych ale (jak zgaduję) dla jednego słowa (wybranego).
+Zmiana banku powoduje że zmieniają się osie, przez co nie można porównać profili dla różnych banków.
+
+Na osi OX dane są chyba dla miesięcy, ale miesiące z liczebnością =0 z jakiegoś powodu nie są pokazywane.
+
+Punktacja: 
+
+Ad 1: 50%
+Ad 2: 60%
+Ad 3: 60%
+
+
+

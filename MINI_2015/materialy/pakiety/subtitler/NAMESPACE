@@ -1,0 +1,6 @@
+exportPattern("^[^\\.]")
+import(RCurl)
+import(XML)
+import(dplyr)
+import(rvest)
+import(stringi)

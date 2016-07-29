@@ -1,0 +1,50 @@
+Faza 3
+
+
+1. Inżynierska jakość kodu R, techniczne rozwiązania, pokonywanie ograniczeń dotyczących ilości danych.
+
+Dobrze że pakiet jest, ale jest niedopracowany:
+
+Nie ma testów w pakiecie.
+
+Funkcja check() zwraca u mnie
+Status: 1 ERROR, 5 WARNINGs, 3 NOTEs
+
+Wiele funkcji nie działa gdy poda się im inne argumenty niż w przykładzie, np.:
+> porownaj_wpisy("2011-08-16","2015-12-31",10)
+Error in order(zagregowane, decreasing = TRUE) : 
+  argument 1 is not a vector
+
+
+Największym ograniczeniem rozwiązania jest to, że dane są przechowywane w pakiecie.
+Jakakolwiek próba aktualizacji danych wymaga przebudowania pakietu.
+
+Statyczny raport może mieć ciekawe wnioski, ale jest mało interaktywny (w przeciwieństwie do aplikacji), trudno go odtworzyć po kilku dniach, ma zdecydowanie większą wartość analityczną niż inżynierską (choć nawet z perspektywy analitycznej sprawdza się do jednego znaleziska).
+
+
+
+2. Pomysłowość i zaawansowanie metod modelowania danych.
+
+W raporcie nie jest opisana metodologia, więc pozostaje opierać się o to co powiedzieli panowie podczas prezentacji.
+
+W kodzie R jest wiele magicznych stałych, które powinny być parametrami.
+np. kod funkcji  porownaj_wpisy zawiera jakieś 1:7, >=2.
+To raz może zadziała na tych danych ale nie ma żadnej gwarancji że kiedykolwiek jeszcze zadziała na innych danych.
+
+
+
+3. Sposób prezentacji wyników, funkcjonalność i czytelność użytych rozwiązań.
+
+W raporcie są literówki, które wykrywa byle spellchecker: stworzyliśm , zostałą , podejrzaymi.
+To dużo literówek biorąc pod uwagę, że cały raport to kilka zdań. Pierwsza faza była już lepiej przygotowana.
+Jak w ogóle czytać zdania typu 'opiera się na naszej narzędziach przygotowanych na pierwszą fazę - analiza częstotliwości'
+
+Raport jest tak krótki, że w żadnen sposób nie wyjaśnia ani jak można by w przyszłości wykrywać problemy anie nawet jak ponownie wykorzystać opracowane rozwiązania.
+
+
+Punktacja: 
+
+Ad 1: 70%
+Ad 2: 80%
+Ad 3: 50%
+
